@@ -1,0 +1,11 @@
+---
+# This is a config file that alters aspects of the site.
+
+# Site refresh frequency (in minutes)
+refresh: 10
+
+# Goals used in the MTD, MTA, & MTR charts
+goals:
+  mtd: 2
+  mta: 4
+  mtr: 6

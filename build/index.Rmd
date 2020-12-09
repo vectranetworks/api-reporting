@@ -1,0 +1,137 @@
+---
+title: "Visibility Dashboard"
+output:
+  html_document:
+    css: "style.css"
+    includes:
+      before_body: "navbar.html"
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "..") })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(warn=-1)
+```
+
+```{r libs, include=FALSE}
+
+libs <- c(
+  "tidyverse",
+  "reactable",
+  "plotly",
+  "ggplot2",
+  "reshape2",
+  "magrittr",
+  "lubridate"
+)
+
+lapply(libs, library, c=T)
+
+theme_set(theme_minimal())
+
+source("functions.R")
+source("libraries.R")
+```
+
+```{r}
+h <- read_log("../logs/hosts.csv")
+hm <- read_log("../logs/host_metrics.csv")
+a <- read_log("../logs/assigned.csv")
+s <- hm %>% select(date, low, medium, high, critical)
+hod <- hm %>% select(date, hosts_observed, hosts_w_detections)
+```
+
+## Host Metrics {.tabset}
+
+### Host Severity
+
+```{r, out.width='100%'}
+color_scheme <- c("low" = "#3E6876", "medium" = "#FFB131", "high" = "#FF591E", "critical" = "#DE1829")
+
+ggplotly(
+  tooltip = c("x", "y", "group"),
+  melt(s, id.vars="date", value.name="Count", variable.name = "Host Severity") %>%
+  ggplot(aes(x=date, y=Count, group=`Host Severity`, color=`Host Severity`)) +
+  geom_line() +
+  geom_point() +
+  scale_color_manual(values = color_scheme)
+)
+```
+
+### Hosts Observed
+```{r, out.width='100%'}
+ggplotly(
+  tooltip = c("x", "y", "group"),
+  melt(hod, id.vars="date", value.name="Count", variable.name="Metric") %>%
+  ggplot(aes(x=date, y=Count, group=Metric, color=Metric)) +
+  geom_line() +
+  geom_point() +
+  expand_limits(y=0)
+)
+```
+
+## Workload Reduction
+
+Here you can see the overall workload reduction Cognito has produced for you. Metrics are for all-time, not just today.
+
+```{r}
+ho <- length(unique(h$id))
+d <- length(unique(a$id))
+hwd <- filter(h, !is.na(severity)) %>% select(id) %>% unique() %>% nrow()
+crit <- filter(h, severity=="critical") %>% select(id) %>% unique() %>% nrow()
+```
+
+***
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+## Data
+
+Here you can see current metrics for hosts. If you'd like to look at how these values have changed historically, see the download section below.
+
+```{r, out.width='100%'}
+current_h <- h %>% 
+  group_by(id) %>%
+  slice(which.max(last_detection_timestamp))
+
+reactable(current_h, filterable=TRUE, highlight=TRUE)
+
+write_csv(current_h, "../data/current_hosts.csv")
+```
+
+## Download
+
+Below you can download (a) current host metrics or (b) historical host metrics.
+
+If you'd like to see the most recent metrics for hosts, click the `Download Current` button.
+
+For the full data, i.e. how these metrics change over time, then check out `Download Historical`. This csv includes historical changes. For example: if host id #1 saw its severity at 100 on Jan 1, and then 99 on Jan 2, then `historical_hosts.csv` will show 2 rows for host id #1: 1/1 with a severity of 100 and 1/2 with 99.
+
+<p>
+
+<a id="button" download="current_hosts.csv" href="../data/current_hosts.csv">Download Current</a><a id="button" download="historical_hosts.csv" href="../logs/hosts.csv">Download Historical</a>
+
+</p>

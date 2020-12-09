@@ -1,0 +1,101 @@
+.navbar{
+  background-color: #26333d;
+  padding: 7px;
+}
+
+.nav_title,
+.nav_title:hover
+{
+  color: white;
+  font-weight:500;
+}
+
+.nav_title:hover {
+  text-decoration: none;
+}
+
+.nav_page,
+.nav_page:hover,
+.nav_page:visited,
+.nav_page:active {
+  margin-left: 12px;
+  color: white !important;
+  font-weight:300;
+}
+
+.nav_right {
+  position: absolute; 
+  right: 16.25px; 
+  top:16.25px;
+}
+
+.title {
+  margin-bottom: 18px;
+  margin-top: 42px;
+  font-size: 35px !important;
+}
+
+.section h2 {
+  padding-top: 30px !important;
+  margin-top: 0px !important;
+}
+
+#download #button,
+#download-1 #button,
+#download-2 #button {
+  all: initial;
+  background-color: #26333d;
+  color: white;
+  border-radius: 8px;
+  font-family: arial, sans-serif;
+  padding: 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+    
+#download #button:hover,
+#download-1 #button:hover,
+#download-2 #button:hover {
+  background-color: #E9F0FB;
+  color: #26333d;
+  border: 1px solid #26333d;
+}
+
+#stat {
+  /*all: initial;*/
+  font-size: 35px;
+  font-weight: 700;
+  color: #26333d;
+}
+
+#stat-col {
+  width: 33.33%;
+  float: left;
+  font-size: 18px;
+  text-align: center;
+}
+
+#w-label {
+  width: 21%;
+  float: left;
+  font-size: 18px;
+  text-align: center;
+}
+
+#w-arrow {
+  width: 5.33333333333333333333333%;
+  float: left;
+  font-size: 18px;
+  text-align: center;
+}
+
+.spacer
+{
+    font-size: 0; 
+    height: 40px;
+    line-height: 0;
+}

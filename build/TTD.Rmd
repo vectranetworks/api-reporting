@@ -1,0 +1,181 @@
+---
+title: "Time to Detect (TTD)"
+output:
+  html_document:
+    css: "style.css"
+    includes:
+      before_body: "navbar.html"
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "..") })
+---
+
+```{r libs, include=FALSE}
+# Loading libraries
+libs <- c(
+  "tidyverse",
+  "reactable",
+  "plotly",
+  "ggplot2",
+  "reshape2",
+  "magrittr",
+  "lubridate",
+  "yaml"
+)
+lapply(libs, library, c=T)
+
+# Options, configs, themes
+options("warn"=-1)
+theme_set(theme_minimal())
+mtd_goal <- read_yaml("../config.yaml")$goals$mtd
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+`Mean Time to Detect` is the average time it took for a detection created by Cognito to be assigned to a cybersecurity analyst.
+
+This represents the very first step in the process: a detection is triggered and a human is assigned to deal with it.
+
+```{r}
+notes_df <- read_log("../logs/notes.csv")
+
+if_mti_exists <-
+  notes_df %>%
+  filter(grepl("btp|mtp|fp", note)) %>%
+  check_data()
+
+btp <- "0%"; mtp <- "0%"; fp <- "0%"
+```
+
+```{r, eval = if_mti_exists}
+top_stats <- 
+  read_log("../logs/notes.csv") %>%
+  filter(grepl("^btp|^mtp|^fp", note)) %>%
+  mutate(
+    btp = ifelse(grepl("^btp", note), 1, 0),
+    mtp = ifelse(grepl("^mtp", note), 1, 0),
+    fp = ifelse(grepl("^fp", note), 1, 0)
+  )
+
+percentify <- function(x, n) (x / n * 100) %>% paste0("%")
+
+n <- nrow(top_stats)
+btp <- top_stats$btp %>% percentify(n)
+mtp <- top_stats$mtp %>% percentify(n)
+fp <- top_stats$fp %>% percentify(n)
+```
+
+## Top-Level Stats
+
+***
+
+<div style="height:70px;">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r fp` </a> </div>
+</div>
+</div>
+
+***
+
+```{r load-data, include=FALSE}
+source("functions.R")
+assigned <- read_log("../logs/assigned.csv")
+```
+
+```{r}
+# MTD is all based on assigned date
+mtd <- "(no data yet)"
+mtd_under <- "(no data yet)"
+
+mtd_df <- assigned %>%
+  select(fired, assigned_date) %>%
+  filter(!is.na(assigned_date)) %>%
+  mutate(td = as.double(assigned_date - fired, units="hours"))
+
+if_data_exists <- check_data(mtd_df)
+```
+
+```{r, eval=if_data_exists}
+mtd <- mean(mtd_df$td) %>% round(2)
+
+mtd_under <- mtd_df %>%
+  mutate(under_goal = ifelse(td<=mtd_goal,1,0)) %$%
+  mean(under_goal) %>%
+  (function(x) paste0(round(x*100,2),"%"))
+
+df <- mtd_df %>%
+  group_by(Day = as.Date(cut(fired, "day"))) %>%
+  summarize(MTD = mean(td), .groups="keep")
+```
+
+```{r, eval = !if_data_exists, out.width='100%'}
+msg <- "No data yet!\nAssign a detection to an analyst\n to see this page populate."
+par(mar = c(0,0,0,0))
+plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
+```
+
+## Data {.tabset}
+
+**Goal**: MTD of under `r mtd_goal` hours. **The overall mean time to detect was `r mtd` hours.**
+
+**`r mtd_under`** of detections had an MTD below the goal.
+
+### Daily MTD (Line)
+
+```{r, eval=if_data_exists, out.width='100%'}
+ggplotly(
+  ggplot(df) +
+  geom_point(aes(x=Day, y=MTD)) +
+  geom_hline(aes(yintercept=mtd_goal), color="red") +
+  geom_line(aes(x=Day, y=MTD))
+)
+```
+
+### Daily MTD (Trend)
+
+```{r, eval=if_data_exists, out.width='100%'}
+ggplotly(
+  ggplot(df) +
+  geom_hline(aes(yintercept=mtd_goal), color="red") +
+  geom_smooth(aes(x=Day, y=MTD), formula = y ~ x, method = "loess") +
+  geom_point(aes(x=Day, y=MTD))
+)
+```
+
+*Note: Loess method will not populate until there are \> 5 data points to smooth over.*
+
+### Histogram
+
+```{r, eval=if_data_exists, out.width='100%'}
+ggplotly(
+  tooltip = c("x","y"),
+  ggplot(df, aes(x=MTD)) +
+  geom_histogram(bins=10, aes(fill=after_stat(count)))
+)
+```
+
+### Table
+
+```{r, eval=if_data_exists, out.width='100%'}
+assigned %>%
+  mutate_if(is.numeric, funs(round(.,2))) %>%
+  table()
+```
+
+## Download
+
+Click the button below to save the latest MTD data as a `.csv`.
+
+```{r, eval=if_data_exists}
+write_csv(df, "../data/mtd.csv")
+```
+
+<a id="button" download="mtd.csv" href="../data/mtd.csv">Download</a>
+<div class="spacer"></div>

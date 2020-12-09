@@ -1,0 +1,163 @@
+# ---- API ----
+
+get_creds <- function(){
+  cat(paste(sep="\n",
+    "Enter your credentials.", 
+    "These are never stored on disk, just in the memory of this process.\n"
+  ));
+  
+  cat("Enter DNS url: ");
+  readLines("stdin", n=1) %>% paste0("https://", ., "/api/v2.1/") %>% Sys.setenv("url"=.)
+  
+  cat("Enter Token: ");
+  readLines("stdin", n=1) %>% Sys.setenv("token"=.)
+}
+
+api_call <- function(fields, object) {
+  
+  # Setting arguments for get() below
+  auth <- paste("Token ", Sys.getenv("token"))
+  url <- paste0(Sys.getenv("url"), object)
+  
+  self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
+
+  query <- list("page_size"=5000)
+  if (fields!="everything") query[["fields"]] <- fields
+  
+  # Get (api call)
+  output <- GET(
+    url = url,
+    config = self_signed,
+    add_headers(Authorization = auth),
+    query = query
+  )
+  
+  # Handle invalid api call: error message and quit
+  if (output$status_code != 200) {
+    cat(paste(
+      "\n\nAPI Fail: Status Code", output$status_code, 
+      "\nCredentials might have changed",
+      "\nCheck token & dns values for typos or spaces\n\n"
+    ))
+    quit(save="yes")
+  }
+  
+  # Handle good api call: turn json to df
+  output <- output %>% 
+    content(as="text", encoding="UTF-8") %>%
+    fromJSON(flatten=TRUE)
+  
+  output$results
+}
+
+# ---- Formatting ----
+
+api_date <- function(x) {
+  as.POSIXct(x, format = "%FT%T", tz="GMT")
+}
+
+api_format <- function(df, object) {
+  
+  if(object == "d"){
+    df %>%
+      rename(
+        fired = first_timestamp,
+        note_date = note_modified_timestamp,
+        note_user = note_modified_by,
+        assigned_user = assigned_to
+      ) %>%
+      mutate(
+        fired = api_date(fired),
+        assigned_date = api_date(assigned_date),
+        note_date = api_date(note_date),
+        assigned_user = as.character(assigned_user),
+        note_user = as.character(note_user),
+        note = as.character(note)
+      ) %>%
+      arrange(fired)
+
+  } else if (object=="h") {
+    if ("host_session_luids" %in% colnames(df)) { 
+      df <- df %>% select(-host_session_luids)
+    }
+    df %>%
+      mutate(last_detection_timestamp = api_date(last_detection_timestamp))
+  
+  # hm = host metrics: severity, hosts observed, hosts w detections
+  } else if (object == "hm") {
+    count_severity <- function(s) nrow(filter(df, severity==s))
+    tibble(
+      date = Sys.Date(),
+      low = count_severity("low"),
+      medium = count_severity("medium"),
+      high = count_severity("high"),
+      critical = count_severity("critical"),
+      hosts_observed = length(unique(df$id)),
+      hosts_w_detections =
+        filter(df, !is.na(severity)) %>% select(id) %>% unique() %>% nrow()
+    )
+  }
+}
+
+csv_format <- function(f) {
+  switch(
+    f,
+    n = cols(
+      note_date = col_datetime(format = "%F %T"),
+      note_user = col_character(),
+      note = col_character()),
+    a = cols(
+      assigned_date = col_datetime(format = "%F %T"),
+      assigned_user = col_character()),
+    h = cols(
+      last_detection_timestamp = col_datetime(format = "%F %T")),
+    hm = cols(
+      date = col_datetime(format="%F %T"),
+      .default = col_integer())
+  )
+}
+
+# ---- Logging ----
+
+read_log <- function(file) {
+  if (grepl("notes",file)) read_csv(file, col_types = csv_format("n"))
+  else if (grepl("assigned",file)) read_csv(file, col_types = csv_format("a"))
+  else if (grepl("hosts", file)) read_csv(file, col_types = csv_format("h"))
+  else if (grepl("metrics", file)) read_csv(file, col_types = csv_format("hm"))
+  else read_csv(file) # for testing purposes
+}
+
+write_log <- function(df, file) {
+  write.table(df, na="", file, sep=",", row.names=FALSE)
+}
+
+make_log <- function(df, file, delete=FALSE) {
+  if (file.exists(file)) {
+    old_rows <- read_log(file)
+    if (delete) {
+      old_rows <- subset(old_rows, date != last(df$date))
+    }
+    new_rows <- anti_join(df, old_rows, by=colnames(df))
+    rbind(old_rows, new_rows) %>% write_log(file)
+  } else {
+    write_log(df, file) 
+  }
+}
+
+# ---- Rmd ----
+
+table <- function(df){
+  reactable(
+    df,
+    pagination = FALSE,
+    highlight = TRUE,
+    #searchable = TRUE,
+    filterable = TRUE,
+    height = 350,
+    defaultColDef = colDef(format = colFormat(digits = 2))
+  )
+}
+
+check_data <- function(df) {
+  if (nrow(df)==0) FALSE else TRUE
+}
