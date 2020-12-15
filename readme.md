@@ -6,9 +6,9 @@ Pre-requisites: Install [docker](https://docs.docker.com/get-docker/) and [git](
 
 To clone the repo on the server, run the following command:
 
-`
+```
 git clone https://github.com/vectranetworks/api-reporting.git
-`
+```
 
 Now, cd into the directory.
 
