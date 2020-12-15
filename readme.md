@@ -4,15 +4,11 @@ Pre-requisites: Install [docker](https://docs.docker.com/get-docker/) and [git](
 
 #### Clone Repo
 
-`vectranetworks` requires all its Github users to have 2FA turned on. This means that you have to clone this repo either via SSH or HTTPS with a token.
+To clone the repo on the server, run the following command:
 
-We recommend you use SSH. Add an SSH key to your github account (see [this guide](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) for help), then run the following command:
-
-```
-git clone git@github.com/vectranetworks/api-reporting.git
-```
-
-If you'd like to use HTTPS and an Access Token instead, follow [this guide](https://github.blog/2013-09-03-two-factor-authentication/#how-does-it-work-for-command-line-git).
+`
+git clone https://github.com/vectranetworks/api-reporting.git
+`
 
 Now, cd into the directory.
 
