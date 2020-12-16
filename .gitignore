@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+.Renviron
+vectra-api.Rproj
+
+*.html
+data/*
+!data/info.txt
+logs/*
+!logs/info.txt
+
+build/testing.R
