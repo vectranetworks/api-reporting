@@ -1,4 +1,4 @@
-DATA
+# data/
 
 Files in this folder contain high-level, easy-to-digest data for three primary security metrics: MTD, MTA, and MTR.
 

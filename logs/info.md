@@ -1,4 +1,4 @@
-LOGS
+# logs/
 
 Files in this folder contain the raw data pulled from your Cognito box which are used in the production of this web app. 
 

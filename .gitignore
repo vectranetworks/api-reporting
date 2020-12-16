@@ -4,12 +4,12 @@
 .Ruserdata
 .DS_Store
 .Renviron
-vectra-api.Rproj
+*.Rproj
 
 *.html
 data/*
-!data/info.txt
+!data/info.md
 logs/*
-!logs/info.txt
+!logs/info.md
 
 build/testing.R
