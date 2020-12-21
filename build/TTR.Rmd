@@ -47,13 +47,13 @@ btp <- "0%"; mtp <- "0%"; fp <- "0%"
 # MTA is all based on priority notes
 if_mta_exists <-
   notes_df %>%
-  filter(grepl("^pri", note)) %>%
+  filter(custom_grep("^pri", note)) %>%
   check_data()
 
 # MTI is all based on closure notes
 if_mti_exists <-
   notes_df %>%
-  filter(grepl("btp|mtp|fp", note)) %>%
+  filter(custom_grep("btp|mtp|fp", note)) %>%
   check_data()
 
 # MTR requires both MTA and MTI
@@ -66,7 +66,7 @@ detect_df <- assigned_df %>%
   subset(!is.na(assigned_date))
 
 ack_df <- notes_df %>%
-  subset(grepl("^pri",note)) %>%
+  subset(custom_grep("^pri",note)) %>%
   mutate(Date = as.Date(note_date)) %>%
   select(id, Date, Priority=note, acked=note_date)
 
@@ -93,7 +93,7 @@ mta_by_date <- mta_df %>%
 
 ```{r mti-work, eval = if_mtr_exists}
 closed_df <- notes_df %>%
-  subset(grepl("^mtp|^fp|^btp",note)) %>%
+  subset(custom_grep("^mtp|^fp|^btp",note)) %>%
   select(id, closed=note_date)
 
 mti_df <-
@@ -138,11 +138,11 @@ This page explores your company's `Time to Respond (TTR)` metrics. First, overal
 
 ```{r, eval = if_mta_exists}
 top_stats <- notes_df %>%
-  filter(grepl("^btp|^mtp|^fp", note)) %>%
+  filter(custom_grep("^btp|^mtp|^fp", note)) %>%
   mutate(
-    btp = ifelse(grepl("^btp", note), 1, 0),
-    mtp = ifelse(grepl("^mtp", note), 1, 0),
-    fp = ifelse(grepl("^fp", note), 1, 0)
+    btp = ifelse(custom_grep("^btp", note), 1, 0),
+    mtp = ifelse(custom_grep("^mtp", note), 1, 0),
+    fp = ifelse(custom_grep("^fp", note), 1, 0)
   )
 
 percentify <- function(x, n) (x / n * 100) %>% paste0("%")

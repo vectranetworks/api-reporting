@@ -161,3 +161,7 @@ table <- function(df){
 check_data <- function(df) {
   if (nrow(df)==0) FALSE else TRUE
 }
+
+custom_grep <- function(...) {
+  grepl(..., ignore.case = TRUE)
+}
