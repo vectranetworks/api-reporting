@@ -91,7 +91,7 @@ mta_by_date <- mta_df %>%
   summarize(MTA = mean(TA), .groups="keep")
 ```
 
-```{r mti-work, eval = if_mti_exists}
+```{r mti-work, eval = if_mtr_exists}
 closed_df <- notes_df %>%
   subset(grepl("^mtp|^fp|^btp",note)) %>%
   select(id, closed=note_date)
