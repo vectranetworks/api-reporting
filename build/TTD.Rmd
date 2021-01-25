@@ -46,6 +46,8 @@ btp <- "0%"; mtp <- "0%"; fp <- "0%"
 ```
 
 ```{r, eval = if_mti_exists}
+rm(btp, mtp, fp)
+
 top_stats <- 
   read_log("../logs/notes.csv") %>%
   filter(custom_grep("^btp|^mtp|^fp", note)) %>%
@@ -55,12 +57,9 @@ top_stats <-
     fp = ifelse(custom_grep("^fp", note), 1, 0)
   )
 
-percentify <- function(x, n) (x / n * 100) %>% paste0("%")
-
-n <- nrow(top_stats)
-btp <- top_stats$btp %>% percentify(n)
-mtp <- top_stats$mtp %>% percentify(n)
-fp <- top_stats$fp %>% percentify(n)
+btp <- top_stat("btp")
+mtp <- top_stat("mtp")
+fp <- top_stat("fp")
 ```
 
 ## Top-Level Stats

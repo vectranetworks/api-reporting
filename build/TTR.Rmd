@@ -137,6 +137,8 @@ This page explores your company's `Time to Respond (TTR)` metrics. First, overal
 ## Top Level Stats
 
 ```{r, eval = if_mta_exists}
+rm(btp, mtp, fp)
+
 top_stats <- notes_df %>%
   filter(custom_grep("^btp|^mtp|^fp", note)) %>%
   mutate(
@@ -145,12 +147,9 @@ top_stats <- notes_df %>%
     fp = ifelse(custom_grep("^fp", note), 1, 0)
   )
 
-percentify <- function(x, n) (x / n * 100) %>% paste0("%")
-
-n <- nrow(top_stats)
-btp <- top_stats$btp %>% percentify(n)
-mtp <- top_stats$mtp %>% percentify(n)
-fp <- top_stats$fp %>% percentify(n)
+btp <- top_stat("btp")
+mtp <- top_stat("mtp")
+fp <- top_stat("fp")
 ```
 
 ***

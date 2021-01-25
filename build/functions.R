@@ -165,3 +165,8 @@ check_data <- function(df) {
 custom_grep <- function(...) {
   grepl(..., ignore.case = TRUE)
 }
+
+top_stat <- function(outcome) {
+  top_stats %>% pluck(outcome) %>% mean() %>%
+    (function(x) x * 100) %>% round(2) %>% paste0("%")
+}

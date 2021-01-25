@@ -13,7 +13,7 @@ git clone https://github.com/vectranetworks/api-reporting.git
 Now, cd into the directory.
 
 ```
-cd vectra-api/
+cd api-reporting/
 ```
 
 At this point you can choose to edit `config.yaml`, which controls the site's refresh frequency and the goals that are shown in different charts. These values can also be updated at any point while the app is running; new config values will propogate upon the next refresh.
