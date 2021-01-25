@@ -24,13 +24,17 @@ api_call <- function(fields, object) {
   query <- list("page_size"=5000)
   if (fields!="everything") query[["fields"]] <- fields
   
-  # Get (api call)
-  output <- GET(
-    url = url,
-    config = self_signed,
-    add_headers(Authorization = auth),
-    query = query
-  )
+  # Try api call 5 times if it fails
+  # GET is an overlay to curl
+  for(i in 1:5) {
+    output <- GET(
+      url = url,
+      config = self_signed,
+      add_headers(Authorization = auth),
+      query = query
+    )
+    if (output$status_code == 200) break
+  }
   
   # Handle invalid api call: error message and quit
   if (output$status_code != 200) {
