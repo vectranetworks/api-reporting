@@ -139,17 +139,18 @@ This page explores your company's `Time to Respond (TTR)` metrics. First, overal
 ```{r, eval = if_mta_exists}
 rm(btp, mtp, fp)
 
-top_stats <- notes_df %>%
-  filter(custom_grep("^btp|^mtp|^fp", note)) %>%
+top_stats <- 
+  read_log("../logs/notes.csv") %>%
+  filter(custom_grep("btp|mtp|fp", note)) %>%
   mutate(
-    btp = ifelse(custom_grep("^btp", note), 1, 0),
-    mtp = ifelse(custom_grep("^mtp", note), 1, 0),
-    fp = ifelse(custom_grep("^fp", note), 1, 0)
+    btp = ifelse(custom_grep("btp", note), 1, 0),
+    mtp = ifelse(custom_grep("mtp", note), 1, 0),
+    fp = ifelse(custom_grep("fp", note), 1, 0)
   )
 
-btp <- top_stat("btp")
-mtp <- top_stat("mtp")
-fp <- top_stat("fp")
+btp <- top_stat("btp", top_stats)
+mtp <- top_stat("mtp", top_stats)
+fp <- top_stat("fp", top_stats)
 ```
 
 ***
@@ -351,7 +352,7 @@ ggplotly(
 ggplotly(
   tooltip = c("x", "y", "group"),
   mti_by_user %>%
-    ggplot(aes(x=assigned_user, y=MTI, fill=assigned_user)) +
+    ggplot(aes(x=assigned_user, y=MTI, fill=replace_na(assigned_user,"None"))) +
     geom_bar(stat="identity")
 )
 ```

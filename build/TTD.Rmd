@@ -60,9 +60,9 @@ top_stats <-
     fp = ifelse(custom_grep("fp", note), 1, 0)
   )
 
-btp <- top_stat("btp")
-mtp <- top_stat("mtp")
-fp <- top_stat("fp")
+btp <- top_stat("btp", top_stats)
+mtp <- top_stat("mtp", top_stats)
+fp <- top_stat("fp", top_stats)
 ```
 
 ## Top-Level Stats
