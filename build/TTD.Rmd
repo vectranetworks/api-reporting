@@ -167,7 +167,8 @@ ggplotly(
 
 ```{r, eval=if_data_exists, out.width='100%'}
 assigned %>%
-  mutate_if(is.numeric, funs(round(.,2))) %>%
+  mutate_if(is.numeric, funs(round(.,0))) %>%
+  filter(!is.na(assigned_user)) %>%
   table()
 ```
 
