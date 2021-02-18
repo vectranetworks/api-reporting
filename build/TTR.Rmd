@@ -178,8 +178,41 @@ write_csv(mtr_df, "../data/mtr.csv")
 
 <a id = "button" download="mta.csv" href="../data/mta.csv">Download</a>
 
-## Outcome Analysis
+## Outcome Analysis {.tabset}
+
+Here you can see the most frequent details for each closure outcome type.
 
 ```{r}
+outcomes <- mtr_df %>%
+  separate(outcome, into=c("outcome", "details"), sep=" ", extra="merge")
+```
 
+### BTP Details
+```{r}
+outcomes %>%
+  filter(custom_grep("btp", outcome)) %>%
+  group_by(details) %>%
+  summarize(n = n(), .groups="keep") %>%
+  arrange(-n) %>%
+  table()
+```
+
+### MTP Details
+```{r}
+outcomes %>%
+  filter(custom_grep("mtp", outcome)) %>%
+  group_by(details) %>%
+  summarize(n = n(), .groups="keep") %>%
+  arrange(-n) %>%
+  table()
+```
+
+### FP Details
+```{r}
+outcomes %>%
+  filter(custom_grep("fp", outcome)) %>%
+  group_by(details) %>%
+  summarize(n = n(), .groups="keep") %>%
+  arrange(-n) %>%
+  table()
 ```
