@@ -6,7 +6,14 @@ libs <- c(
   "tidyverse",
   "servr",
   "rmarkdown",
-  "yaml"
+  "yaml",
+  "tidyverse",
+  "reactable",
+  "plotly",
+  "ggplot2",
+  "reshape2",
+  "magrittr",
+  "lubridate"
 )
 
 lapply(libs, function(...){
@@ -14,3 +21,4 @@ lapply(libs, function(...){
 })
 
 options(warn=-1)
+options("scipen"=100)

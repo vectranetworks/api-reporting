@@ -11,17 +11,7 @@ knit: (function(inputFile, encoding) {
 
 ```{r libs, include=FALSE}
 # Loading libraries
-libs <- c(
-  "tidyverse",
-  "reactable",
-  "plotly",
-  "ggplot2",
-  "reshape2",
-  "magrittr",
-  "lubridate",
-  "yaml"
-)
-lapply(libs, library, c=T)
+source("libraries.R")
 
 # Redundant?
 source("functions.R")

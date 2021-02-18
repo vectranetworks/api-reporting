@@ -11,141 +11,80 @@ knit: (function(inputFile, encoding) {
 
 ```{r, include=FALSE}
 # Libraries
-libs <- c(
-  "tidyverse",
-  "reactable",
-  "plotly",
-  "ggplot2",
-  "reshape2",
-  "magrittr",
-  "lubridate"
-)
-lapply(libs, library, c=T)
+source("libraries.R")
 
 # Functions
 source("functions.R")
 
 # Data
-notes_df <- read_log("../logs/notes.csv")
 assigned_df <- read_log("../logs/assigned.csv")
+# notes have commas and newlines in them, breaking the csv
+# thus, the need for note_fixer.sh
+system("./note_fixer.sh")
+notes_df <- read_log("../logs/new_notes.csv")
 
 # Options, configs, themes
 theme_set(theme_minimal())
-mta_goal <- read_yaml("../config.yaml")$goals$mta
 mtr_goal <- read_yaml("../config.yaml")$goals$mtr
 knitr::opts_chunk$set(echo = FALSE)
-options(warn=-1)
 ```
 
 ```{r data-check}
-mta <- "(no data yet)"
 mtr <- "(no data yet)"
-mta_under <- "(no data yet)"
 mtr_under <- "(no data yet)"
 btp <- "0%"; mtp <- "0%"; fp <- "0%"
 
-# MTA is all based on priority notes
-if_mta_exists <-
-  notes_df %>%
-  filter(custom_grep("^pri", note)) %>%
-  check_data()
-
-# MTI is all based on closure notes
-if_mti_exists <-
+# Check if closure notes exist
+if_mtr_exists <-
   notes_df %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   check_data()
-
-# MTR requires both MTA and MTI
-if_mtr_exists <- if_mta_exists & if_mti_exists
 ```
 
-```{r mta-work, eval = if_mta_exists}
+```{r eval = if_mtr_exists}
 detect_df <- assigned_df %>%
   select(id, assigned_date, assigned_user) %>%
   subset(!is.na(assigned_date))
 
-ack_df <- notes_df %>%
-  subset(custom_grep("^pri",note)) %>%
-  mutate(Date = as.Date(note_date)) %>%
-  select(id, Date, Priority=note, acked=note_date)
-
-mta_df <-
-  left_join(detect_df, ack_df, by="id") %>%
-  subset(!is.na(Priority)) %>%
-  mutate(TA = as.double(acked - assigned_date, units="hours"))
-
-mta <- mean(mta_df$TA) %>% round(2)
-
-mta_under <- mta_df %>%
-  mutate(under_goal = ifelse(TA<=mta_goal,1,0)) %$%
-  mean(under_goal) %>%
-  (function(x) paste0(round(x*100,2),"%"))
-
-mta_by_user <- mta_df %>%
-  group_by(assigned_user) %>%
-  summarize(MTA = mean(TA), .groups="keep")
-
-mta_by_date <- mta_df %>%
-  group_by(Date) %>%
-  summarize(MTA = mean(TA), .groups="keep")
-```
-
-```{r mti-work, eval = if_mtr_exists}
 closed_df <- notes_df %>%
-  subset(custom_grep("^mtp|^fp|^btp",note)) %>%
-  select(id, closed=note_date)
+  subset(custom_grep("mtp|fp|btp",note)) %>%
+  select(id, closed_date=note_date, outcome=note)
 
-mti_df <-
-  left_join(ack_df,closed_df,by="id") %>%
-  left_join(detect_df, by="id") %>%
-  subset(!is.na(closed)) %>% # don't calc MTI for detections that aren't closed
-  mutate(TI = as.double(closed-acked, units="hours"))
+mtr_df <-
+  left_join(detect_df,closed_df,by="id") %>%
+  unique() %>%
+  subset(!is.na(closed_date)) %>% # don't calc MTI for detections that aren't closed
+  mutate(TR = as.double(closed_date-assigned_date, units="hours")) %>%
+  mutate(TR=ifelse(TR <0, 0, TR)) # no negative responses!
 
-mti_by_date <- mti_df %>%
-  group_by(Priority, Date) %>%
-  summarize(MTI = mean(TI, na.rm=TRUE), .groups="keep")
+mtr_by_date <- mtr_df %>%
+  group_by(closed_date) %>%
+  summarize(MTR = mean(TR, na.rm=TRUE), .groups="keep")
 
-mti_by_user <- mti_df %>%
-  group_by(Priority, assigned_user) %>%
-  summarize(MTI = mean(TI, na.rm=TRUE), .groups="keep")
-```
-
-```{r mtr-work, eval= if_mtr_exists}
-mtr_df <- mti_df %>%
-  subset(!is.na(closed)) %>%
-  mutate(TR = as.double(closed - assigned_date, units="hours"))
-
-mtr <- mean(mtr_df$TR) %>% round(2)
+mtr_by_user <- mtr_df %>%
+  group_by(assigned_user) %>%
+  summarize(MTR = mean(TR, na.rm=TRUE), .groups="keep")
 
 mtr_under <- mtr_df %>%
   mutate(under_goal = ifelse(TR<=mtr_goal,1,0)) %$%
   mean(under_goal) %>%
   (function(x) paste0(round(x*100,2),"%"))
-
-mtr_by_date <- mtr_df %>%
-  group_by(Priority, Date) %>%
-  summarize(MTR = mean(TR, na.rm=TRUE), .groups="keep")
-
-mtr_by_user <- mtr_df %>%
-  group_by(Priority, assigned_user) %>%
-  summarize(MTR = mean(TR, na.rm=TRUE), .groups="keep")
 ```
 
-This page explores your company's `Time to Respond (TTR)` metrics. First, overall TTR are given. Then, this is broken down into two halves: `Time to Acknowledge (TTA)` and `Time to Investigate (TTI)`. A visual guide of the components of TTR are found on the Info page.
+
+This page explores your company's `Time to Respond (TTR)` metrics. TTR is the time between a detection being assigned to an analyst and being closed out with a note such as 'MTP', 'BTP', or 'FP'.
 
 ## Top Level Stats
 
-```{r, eval = if_mta_exists}
+```{r, eval = if_mtr_exists}
 rm(btp, mtp, fp)
 
 top_stats <- 
-  read_log("../logs/notes.csv") %>%
-  filter(custom_grep("btp|mtp|fp", note)) %>%
+  mtr_df %>%
   mutate(
-    btp = ifelse(custom_grep("btp", note), 1, 0),
-    mtp = ifelse(custom_grep("mtp", note), 1, 0),
-    fp = ifelse(custom_grep("fp", note), 1, 0)
+    btp = ifelse(custom_grep("btp", outcome), 1, 0),
+    mtp = ifelse(custom_grep("mtp", outcome), 1, 0),
+    fp = ifelse(custom_grep("fp", outcome), 1, 0)
   )
 
 btp <- top_stat("btp", top_stats)
@@ -171,7 +110,7 @@ fp <- top_stat("fp", top_stats)
 
 ***
 
-## Time to Respond (Overall) {.tabset}
+## Time to Respond {.tabset}
 
 **Goal**: MTR of under `r mtr_goal` hours. **The overall mean time to detect was `r mtr` hours.**
 
@@ -190,9 +129,9 @@ text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
 ggplotly(
   mtr_by_date %>%
     ggplot() +
-    geom_point(aes(x=Date, y=MTR)) +
+    geom_point(aes(x=closed_date, y=MTR)) +
     geom_hline(aes(yintercept=mtr_goal), color="red") +
-    geom_smooth(aes(x=Date, y=MTR), formula = y ~ x, method = "loess")
+    geom_smooth(aes(x=closed_date, y=MTR), formula = y ~ x, method = "loess")
 )
 ```
 
@@ -210,7 +149,7 @@ ggplotly(
 )
 ```
 
-### MTA by Analyst
+### MTR by Analyst
 
 ```{r, eval = if_mtr_exists, out.width='100%'}
 ggplotly(
@@ -229,149 +168,18 @@ mtr_df %>%
   table()
 ```
 
-## Time to Acknowledge
-
-`Time to acknowledge` is the time between a detection being assigned to an analyst and a priority note being added to it. This is the first half of response. `MTA` stands for "Mean time to Acknowledge," and is investigated in the charts below.
-
-```{r, eval = !if_mta_exists, out.width='100%'}
-msg <- "No data yet!\nWrite a note with the keyword 'pri'\n to see this page populate."
-par(mar = c(0,0,0,0))
-plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
-```
-
-## Data {.tabset}
-
-**Goal**: MTA of under `r mta_goal` hours. **The overall mean time to acknowledge was `r mta` hours.**
-
-**`r mta_under`** of detections had an MTR below the goal.
-
-### Daily MTA
-
-```{r, eval = if_mta_exists, out.width='100%'}
-ggplotly(
-  mta_by_date %>%
-    ggplot() +
-    geom_point(aes(x=Date, y=MTA)) +
-    geom_hline(aes(yintercept=mta_goal), color="red") +
-    geom_smooth(aes(x=Date, y=MTA), formula = y ~ x, method = "loess")
-)
-```
-
-*Note: Trendline will not populate until there are ~ 5 data points to smooth over.*
-
-### Daily MTA (Histogram)
-
-```{r, eval = if_mta_exists, out.width='100%'}
-ggplotly(
-  tooltip = c("x", "y"),
-  mta_by_date %>%
-    ggplot(aes(x=MTA)) +
-    geom_histogram(bins=10, aes(fill=after_stat(count))) +
-    theme_minimal()
-)
-```
-
-### MTA by Analyst
-
-```{r, eval = if_mta_exists, out.width='100%'}
-ggplotly(
-  tooltip = c("x", "y"),
-  mta_by_user %>%
-    ggplot(aes(x=assigned_user, y=MTA, fill=assigned_user)) +
-    geom_bar(stat="identity")
-)
-```
-
-
-### Table (Raw Data)
-
-```{r, eval = if_mta_exists, out.width='100%'}
-mta_df %>%
-  mutate_if(is.numeric, funs(round(.,2))) %>%
-  table()
-```
-
 ## Download
 
-Click the button below to save the latest MTD data as a `.csv`.
+Click the button below to save the latest MTR data as a `.csv`.
 
-```{r, eval = if_mta_exists}
-write_csv(mta_df, "../data/mta.csv")
+```{r, eval = if_mtr_exists}
+write_csv(mtr_df, "../data/mtr.csv")
 ```
 
 <a id = "button" download="mta.csv" href="../data/mta.csv">Download</a>
 
-------------------------------------------------------------------------
+## Outcome Analysis
 
-## Time to Investigate
+```{r}
 
-`Mean time to investigate` is the average amount of time it took between a detection being assigned to an analyst and being marked as resolved.
-
-When an analyst finishes their investigation, they determine whether the detection was a false positive (FP), benign true positive (BTP), or malicious true positive (MTP).
-
-```{r, eval = !if_mti_exists, out.width='100%'}
-msg <- "No data yet!\nWrite a note with the keyword 'btp' or 'mtp' or 'fp'\n to see this page populate."
-par(mar = c(0,0,0,0))
-plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
 ```
-
-## Data {.tabset}
-
-### Daily MTI
-
-```{r, eval = if_mti_exists, out.width='100%'}
-ggplotly(
-  tooltip = c("x", "y", "group"),
-  mti_by_date %>%
-    ggplot(aes(x=Date, y=MTI, group=Priority, color=Priority)) +
-    geom_smooth(method="loess", formula = y ~ x) +
-    geom_point()
-)
-```
-
-### Daily MTI (Histogram)
-
-```{r, eval = if_mti_exists, out.width='100%'}
-ggplotly(
-  tooltip = c("x", "y", "group"),
-  mti_by_date %>%
-    ggplot(aes(x=MTI, group=Priority)) +
-    geom_histogram(
-      aes(fill=Priority),
-      bins=80, alpha=0.7,
-      position = 'identity'
-    )
-)
-```
-
-### MTI by Analyst
-
-```{r, eval = if_mti_exists, out.width='100%'}
-ggplotly(
-  tooltip = c("x", "y", "group"),
-  mti_by_user %>%
-    ggplot(aes(x=assigned_user, y=MTI, fill=replace_na(assigned_user,"None"))) +
-    geom_bar(stat="identity")
-)
-```
-
-### Table
-
-```{r, eval = if_mti_exists, out.width='100%'}
-mti_df %>%
-  mutate_if(is.numeric, funs(round(.,2))) %>%
-  reactable()
-```
-
-## Download
-
-Click the button below to save the latest MTI data as a `.csv`.
-
-```{r, eval = if_mti_exists}
-write_csv(mti_df, "../data/mti.csv")
-```
-
-<a id="button" download="mti.csv" href="../data/mti.csv">Download</a>
-<div class="spacer"></div>

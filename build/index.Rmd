@@ -61,6 +61,9 @@ ggplotly(
 
 ### Hosts Observed
 ```{r, out.width='100%'}
+fake_hod <- hod %>% add_row(date=today(), hosts_observed=10000, hosts_w_detections=50)
+# confirmed this chart can go to 10,000
+
 ggplotly(
   tooltip = c("x", "y", "group"),
   melt(hod, id.vars="date", value.name="Count", variable.name="Metric") %>%
