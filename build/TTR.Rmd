@@ -57,6 +57,8 @@ mtr_df <-
   mutate(TR = as.double(closed_date-assigned_date, units="hours")) %>%
   mutate(TR=ifelse(TR <0, 0, TR)) # no negative responses!
 
+mtr <- mean(mtr_df$TR) %>% round(2)
+
 mtr_by_date <- mtr_df %>%
   group_by(closed_date) %>%
   summarize(MTR = mean(TR, na.rm=TRUE), .groups="keep")
@@ -184,7 +186,8 @@ Here you can see the most frequent details for each closure outcome type.
 
 ```{r}
 outcomes <- mtr_df %>%
-  separate(outcome, into=c("outcome", "details"), sep=" ", extra="merge")
+  separate(outcome, into=c("outcome", "details"), sep=" ", extra="merge") %>%
+  mutate(details = tolower(details))
 ```
 
 ### BTP Details
