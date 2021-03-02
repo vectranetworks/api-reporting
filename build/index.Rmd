@@ -16,18 +16,6 @@ options(warn=-1)
 
 ```{r libs, include=FALSE}
 
-libs <- c(
-  "tidyverse",
-  "reactable",
-  "plotly",
-  "ggplot2",
-  "reshape2",
-  "magrittr",
-  "lubridate"
-)
-
-lapply(libs, library, c=T)
-
 theme_set(theme_minimal())
 
 source("functions.R")

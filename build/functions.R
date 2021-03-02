@@ -2,8 +2,8 @@
 
 get_creds <- function(){
   cat(paste(sep="\n",
-    "Enter your credentials.", 
-    "These are never stored on disk, just in the memory of this process.\n"
+            "Enter your credentials.", 
+            "These are never stored on disk, just in the memory of this process.\n"
   ));
   
   cat("Enter DNS url: ");
@@ -20,7 +20,7 @@ api_call <- function(fields, object) {
   url <- paste0(Sys.getenv("url"), object)
   
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
-
+  
   query <- list("page_size"=5000)
   if (fields!="everything") query[["fields"]] <- fields
   
@@ -79,15 +79,15 @@ api_format <- function(df, object) {
         note = as.character(note)
       ) %>%
       arrange(fired)
-
+    
   } else if (object=="h") {
     if ("host_session_luids" %in% colnames(df)) { 
       df <- df %>% select(-host_session_luids)
     }
     df %>%
       mutate(last_detection_timestamp = api_date(last_detection_timestamp))
-  
-  # hm = host metrics: severity, hosts observed, hosts w detections
+    
+    # hm = host metrics: severity, hosts observed, hosts w detections
   } else if (object == "hm") {
     count_severity <- function(s) nrow(filter(df, severity==s))
     tibble(
@@ -124,7 +124,7 @@ csv_format <- function(f) {
 # ---- Logging ----
 
 read_log <- function(file) {
-  if (grepl("notes",file)) read_csv(file, col_types = csv_format("n"))
+  if (grepl("notes",file)) read_csv(file, quote='"', col_types = csv_format("n"))
   else if (grepl("assigned",file)) read_csv(file, col_types = csv_format("a"))
   else if (grepl("hosts", file)) read_csv(file, col_types = csv_format("h"))
   else if (grepl("metrics", file)) read_csv(file, col_types = csv_format("hm"))
@@ -173,4 +173,27 @@ custom_grep <- function(...) {
 top_stat <- function(outcome, df) {
   df %>% pluck(outcome) %>% mean() %>%
     (function(x) x * 100) %>% round(2) %>% paste0("%")
+}
+
+this_time <- function(df, time) {
+  filter(df, floor_date(note_date, unit=time) == floor_date(today(), unit=time))
+}
+
+last_time <- function(df, time) {
+  # no quarters() function, so do -1 quarter manually if time == "quarters"
+  if (time != "quarter") {
+    previous <- floor_date(today(),time) - match.fun(paste0(time,"s"))(1)
+  } else {
+    previous <- floor_date(today(), "quarter") - months(3)
+  }
+  filter(df, floor_date(note_date, time) == previous)
+}
+
+list_top_stats <- function(df){
+  list(
+    "btp" = top_stat("btp", df),
+    "mtp" = top_stat("mtp", df),
+    "fp" = top_stat("fp", df),
+    "n" = nrow(df)
+  )
 }

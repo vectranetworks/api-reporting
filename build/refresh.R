@@ -30,4 +30,7 @@ lapply(
   list.files(pattern = "\\.Rmd$"),
   (function(x) rmarkdown::render(input=x, output_dir = "..", quiet=TRUE))
 )
+# Notes often have commas and newlines in them, breaking the csv
+# Thus, the need for note_fixer.sh
+system("./note_fixer.sh")
 cat("Done\n")

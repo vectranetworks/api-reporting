@@ -41,7 +41,7 @@ btp <- "0%"; mtp <- "0%"; fp <- "0%"
 ```{r, eval = if_mti_exists}
 rm(btp, mtp, fp)
 
-top_stats <- 
+closures <- 
   read_log("../logs/notes.csv") %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   mutate(
@@ -50,16 +50,27 @@ top_stats <-
     fp = ifelse(custom_grep("fp", note), 1, 0)
   )
 
-btp <- top_stat("btp", top_stats)
-mtp <- top_stat("mtp", top_stats)
-fp <- top_stat("fp", top_stats)
+#####
+# To do: reduce # of lines by mapping thru these things
+#####
+
+# Current
+c_w <- this_time(closures, "week") %>% list_top_stats()
+c_m <- this_time(closures, "month") %>% list_top_stats()
+c_q <- this_time(closures, "quarter") %>% list_top_stats()
+
+# Last
+l_w <- last_time(closures, "week") %>% list_top_stats()
+l_m <- last_time(closures, "month") %>% list_top_stats()
+l_q <- last_time(closures, "quarter") %>% list_top_stats()
+
 ```
 
-## Top-Level Stats
+## Top-Level Stats {.tabset}
 
-***
+### This Week
 
-<div style="height:70px;">
+<div style="height:70px;" id="closed_w">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -67,16 +78,123 @@ fp <- top_stat("fp", top_stats)
 </div>
 
 <div>
-  <div id="stat-col"> <a id="stat"> `r mtp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r btp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r fp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_w$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_w$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_w$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed this week: <b> `r c_w$n` </b> </i>
+</div>
+</div>
+
+***
+
+### Last Week
+
+<div style="height:70px;" id="closed_w">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r l_w$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_w$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_w$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed last week: <b> `r l_w$n` </b> </i>
+</div>
+</div>
+
+***
+
+### This Month
+
+<div style="height:70px;" id="closed_m">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r c_m$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_m$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_m$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed this month: <b> `r c_m$n` </b> </i>
+</div>
+</div>
+
+***
+
+### Last Month
+
+<div style="height:70px;" id="closed_m">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r l_m$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_m$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_m$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed last month: <b> `r l_m$n` </b> </i>
+</div>
+</div>
+
+***
+
+### This Quarter
+
+<div style="height:70px;" id="closed_q">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r c_q$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_q$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r c_q$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed this quarter: <b> `r c_q$n` </b> </i>
+</div>
+</div>
+
+***
+
+### Last Quarter
+
+<div style="height:70px;" id="closed_q">
+<div>
+  <div id="stat-col">Malicious true positives</div>
+  <div id="stat-col">Benign true positives</div>
+  <div id="stat-col">False positives</div>
+</div>
+
+<div>
+  <div id="stat-col"> <a id="stat"> `r l_q$mtp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_q$btp` </a> </div>
+  <div id="stat-col"> <a id="stat"> `r l_q$fp` </a> </div>
+</div>
+<div style="float: right;">
+  <i> Total detections closed last quarter: <b> `r l_q$n` </b> </i>
 </div>
 </div>
 
 ***
 
 ```{r load-data, include=FALSE}
-source("functions.R")
 assigned <- read_log("../logs/assigned.csv")
 ```
 
