@@ -150,6 +150,7 @@ make_log <- function(df, file, delete=FALSE) {
 
 # ---- Rmd ----
 
+### Universal
 table <- function(df){
   reactable(
     df,
@@ -170,6 +171,38 @@ custom_grep <- function(...) {
   grepl(..., ignore.case = TRUE)
 }
 
+### Visbility Workload Reduction
+
+list_vis_stats <- function(sub_h, sub_a){
+  list(
+    "ho" = length(unique(sub_h$ip)),
+    "d" = length(unique(sub_a$id)),
+    "hwd" = filter(sub_h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow(),
+    "crit" = filter(sub_h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
+  )
+}
+
+vis_this_time <- function(h, a, time){
+  sub_h <- filter(h, floor_date(last_detection_timestamp, unit=time) == floor_date(today(), unit=time))
+  sub_a <- filter(a, floor_date(fired, time) == floor_date(today(), unit=time))
+  
+  list_vis_stats(sub_h, sub_a)
+}
+
+vis_last_time <- function(h, a, time){
+  if (time != "quarter") {
+    previous <- floor_date(today(),time) - match.fun(paste0(time,"s"))(1)
+  } else {
+    previous <- floor_date(today(), "quarter") - months(3)
+  }
+  
+  sub_h <- filter(h, floor_date(last_detection_timestamp, time)==previous)
+  sub_a <- filter(a, floor_date(fired, time)==previous)
+  
+  list_vis_stats(sub_h, sub_a)
+}
+
+### TTD & TTR Top Stats
 top_stat <- function(outcome, df) {
   df %>% pluck(outcome) %>% mean() %>%
     (function(x) x * 100) %>% round(2) %>% paste0("%")

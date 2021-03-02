@@ -15,11 +15,9 @@ options(warn=-1)
 ```
 
 ```{r libs, include=FALSE}
-
-theme_set(theme_minimal())
-
 source("functions.R")
 source("libraries.R")
+theme_set(theme_minimal())
 ```
 
 ```{r}
@@ -62,18 +60,27 @@ ggplotly(
 )
 ```
 
-## Workload Reduction
+## Workload Reduction {.tabset}
 
-Here you can see the overall workload reduction Cognito has produced for you. Metrics are for all-time, not just today.
+Here you can see the overall workload reduction Cognito has produced for you. Metrics are filterable for different time periods.
 
 ```{r}
+c_w <- vis_this_time(h,a,"week")
+c_m <- vis_this_time(h,a,"month")
+c_q <- vis_this_time(h,a,"month")
+
+l_w <- vis_last_time(h,a,"week")
+l_m <- vis_last_time(h,a,"month")
+l_q <- vis_last_time(h,a,"quarter")
+
 ho <- length(unique(h$ip))
 d <- length(unique(a$id))
 hwd <- filter(h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow()
 crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 ```
 
-***
+### This Week
+
 <div style="height:70px;">
 
 <div>
@@ -86,13 +93,148 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label">Critical Detections</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r ho` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_w$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r d` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_w$d` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r hwd` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_w$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r crit` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_w$crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+### Last Week
+
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r l_w$ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_w$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_w$hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_w$crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+### This Month
+
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r c_m$ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_m$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_m$hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_m$crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+### Last Month
+
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r l_m$ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_m$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_m$hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_m$crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+### This Quarter
+
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r c_q$ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_q$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_q$hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_q$crit` </a> </div>
+</div>
+
+</div>
+
+***
+
+### Last Quarter
+
+<div style="height:70px;">
+
+<div>
+  <div id="w-label">Hosts Observed</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Critical Detections</div>
+</div>
+<div>
+  <div id="w-label"> <a id="stat"> `r l_q$ho` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_q$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_q$hwd` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_q$crit` </a> </div>
 </div>
 
 </div>
