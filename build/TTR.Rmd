@@ -79,13 +79,14 @@ This page explores your company's `Time to Respond (TTR)` metrics. TTR is the ti
 rm(btp, mtp, fp)
 
 closures <- 
-  read_log("../logs/notes.csv") %>%
+  read_log("../logs/new_notes.csv") %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   mutate(
     btp = ifelse(custom_grep("btp", note), 1, 0),
     mtp = ifelse(custom_grep("mtp", note), 1, 0),
     fp = ifelse(custom_grep("fp", note), 1, 0)
-  )
+  ) %>%
+  unique()
 
 #####
 # To do: reduce # of lines by mapping thru these things
