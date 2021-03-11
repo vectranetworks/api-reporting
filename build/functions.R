@@ -159,7 +159,7 @@ table <- function(df){
     #searchable = TRUE,
     filterable = TRUE,
     height = 350,
-    defaultColDef = colDef(format = colFormat(digits = 2))
+    #defaultColDef = colDef(format = colFormat(digits = 2))
   )
 }
 
@@ -169,6 +169,10 @@ check_data <- function(df) {
 
 custom_grep <- function(...) {
   grepl(..., ignore.case = TRUE)
+}
+
+percentify <- function(num, n) {
+  ((num/n)*100) %>% round(2) %>% paste0("%")
 }
 
 ### Visbility Workload Reduction
@@ -203,11 +207,6 @@ vis_last_time <- function(h, a, time){
 }
 
 ### TTD & TTR Top Stats
-top_stat <- function(outcome, df) {
-  df %>% pluck(outcome) %>% mean() %>%
-    (function(x) x * 100) %>% round(2) %>% paste0("%")
-}
-
 this_time <- function(df, time) {
   filter(df, floor_date(note_date, unit=time) == floor_date(today(), unit=time))
 }
@@ -222,11 +221,14 @@ last_time <- function(df, time) {
   filter(df, floor_date(note_date, time) == previous)
 }
 
-list_top_stats <- function(df){
-  list(
-    "btp" = top_stat("btp", df),
-    "mtp" = top_stat("mtp", df),
-    "fp" = top_stat("fp", df),
-    "n" = nrow(df)
+top_stats<- function(df) {
+  tibble(
+    "b"= sum(custom_grep("^btp", df$note)),
+    "m"=sum(custom_grep("^mtp", df$note)),
+    "f"=sum(custom_grep("^fp", df$note)),
+    "n"=sum(custom_grep("^btp|^mtp|^fp", df$note)),
+    "btp"=percentify(b, n),
+    "mtp"=percentify(m, n),
+    "fp"=percentify(f, n)
   )
 }

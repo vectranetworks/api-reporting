@@ -1,5 +1,5 @@
 ---
-title: "Time to Respond (TTR)"
+title: "Mean Time to Close (MTC)"
 output:
   html_document:
     css: "style.css"
@@ -23,8 +23,8 @@ notes_df <- read_log("../logs/new_notes.csv")
 # Options, configs, themes
 theme_set(theme_minimal())
 mtr_goal <- read_yaml("../config.yaml")$goals$mtr
+mta_goal <- read_yaml("../config.yaml")$goals$mta
 knitr::opts_chunk$set(echo = FALSE)
-options("scipen"=100)
 ```
 
 ```{r data-check}
@@ -39,41 +39,8 @@ if_mtr_exists <-
   check_data()
 ```
 
-```{r eval = if_mtr_exists}
-detect_df <- assigned_df %>%
-  select(id, assigned_date, assigned_user) %>%
-  subset(!is.na(assigned_date))
 
-closed_df <- notes_df %>%
-  subset(custom_grep("mtp|fp|btp",note)) %>%
-  select(id, closed_date=note_date, outcome=note)
-
-mtr_df <-
-  left_join(detect_df,closed_df,by="id") %>%
-  unique() %>%
-  subset(!is.na(closed_date)) %>% # don't calc MTI for detections that aren't closed
-  mutate(TTR = as.double(closed_date-assigned_date, units="hours")) %>%
-  mutate(TTR=ifelse(TTR <0, 0, TTR)) # no negative responses!
-
-mtr <- mean(mtr_df$TTR) %>% round(2)
-
-mtr_by_date <- mtr_df %>%
-  mutate(closed_date = floor_date(closed_date, unit="day")) %>%
-  group_by(closed_date) %>%
-  summarize(MTR = mean(TTR, na.rm=TRUE), .groups="keep")
-
-mtr_by_user <- mtr_df %>%
-  group_by(assigned_user) %>%
-  summarize(MTR = mean(TTR, na.rm=TRUE), .groups="keep")
-
-mtr_under <- mtr_df %>%
-  mutate(under_goal = ifelse(TTR<=mtr_goal,1,0)) %$%
-  mean(under_goal) %>%
-  (function(x) paste0(round(x*100,2),"%"))
-```
-
-
-This page explores your company's `Time to Respond (TTR)` metrics. TTR is the time between a detection being assigned to an analyst and being closed out with a note such as 'MTP', 'BTP', or 'FP'.
+This page explores your company's `Time to Close (TTC)` metrics. Mean Time to Close is the average time it took for an analyst to perform the full end-to-end spectrum of activities from acknowledgement to resolution. A detection's TTC is the time between it firing and being closed.
 
 ## Top-Level Stats {.tabset}
 
@@ -267,11 +234,47 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 
 ***
 
-## Time to Respond {.tabset}
+## TTC {.tabset}
 
-**Goal**: MTR of under `r mtr_goal` hours. **The overall mean time to detect was `r mtr` hours.**
+```{r eval = if_mtr_exists}
+detect_df <- assigned_df %>%
+  select(id, fired, assigned_date, assigned_user) %>%
+  subset(!is.na(assigned_date))
 
-**`r mtr_under`** of detections had an MTR below the goal.
+closed_df <- notes_df %>%
+  subset(custom_grep("mtp|fp|btp",note)) %>%
+  select(id, closed_date=note_date, outcome=note)
+
+mtc_df <-
+  left_join(detect_df,closed_df,by="id") %>%
+  unique() %>%
+  subset(!is.na(closed_date)) %>% # don't calc MTI for detections that aren't closed
+  mutate(
+    TTD = as.double(assigned_date - fired, units="hours"),
+    TTR = as.double(closed_date - assigned_date, units="hours"),
+    TTC = as.double(closed_date - fired, units="hours")
+  ) %>%
+  mutate_if(is.numeric, ~ifelse(.<0, 0, .)) # no negative anything
+
+ttc <- mean(mtc_df$TTC) %>% round(2)
+
+ttc_by_date <- mtc_df %>%
+  mutate(
+    closed_date = floor_date(closed_date, unit="day"),
+    Outcome=tolower(substr(mtc_df$outcome,1,3))
+  ) %>%
+  group_by(closed_date, Outcome) %>%
+  summarize(MTC = mean(TTC, na.rm=TRUE), .groups="keep")
+
+ttc_by_user <- mtc_df %>%
+  group_by(assigned_user) %>%
+  summarize(MTC = mean(TTC, na.rm=TRUE), .groups="keep")
+
+ttc_under <- mtc_df %>%
+  mutate(under_goal = ifelse(TTC<=mtr_goal+mta_goal,1,0)) %$%
+  mean(under_goal) %>%
+  (function(x) paste0(round(x*100,2),"%"))
+```
 
 ```{r, eval = !if_mtr_exists, out.width='100%'}
 msg <- "No data yet!\nAdd a priority & closure note to a detection\nto see this page populate."
@@ -280,39 +283,50 @@ plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
 text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
 ```
 
-### Daily MTR
+### Daily TTC
 
 ```{r, eval = if_mtr_exists, out.width='100%'}
 ggplotly(
-  mtr_by_date %>%
+  ttc_by_date %>%
     ggplot() +
-    geom_point(aes(x=closed_date, y=MTR)) +
-    geom_hline(aes(yintercept=mtr_goal), color="red") +
-    geom_smooth(aes(x=closed_date, y=MTR), formula = y ~ x, method = "loess")
+    geom_point(aes(x=closed_date, y=MTC)) +
+    geom_hline(aes(yintercept=mtr_goal+mta_goal), color="red") +
+    geom_smooth(aes(x=closed_date, y=MTC), formula = y ~ x, method = "loess")
 )
 ```
 
-*Note: Trendline will not populate until there are ~ 5 data points to smooth over.*
+### Daily TTC by Outcome
 
-### Daily MTR (Histogram)
+```{r, eval = if_mtr_exists, out.width='100%'}
+ggplotly(
+  ttc_by_date %>%
+    ggplot(aes(group=Outcome, color=Outcome)) +
+    geom_point(aes(x=closed_date, y=MTC)) +
+    geom_hline(aes(yintercept=mtr_goal+mta_goal), color="red") +
+    geom_line(aes(x=closed_date, y=MTC))
+)
+```
+
+
+### Daily TTC (Histogram)
 
 ```{r, eval = if_mtr_exists, out.width='100%'}
 ggplotly(
   tooltip = c("x", "y"),
-  mtr_by_date %>%
-    ggplot(aes(x=MTR)) +
+  ttc_by_date %>%
+    ggplot(aes(x=MTC)) +
     geom_histogram(bins=10, aes(fill=after_stat(count))) +
     theme_minimal()
 )
 ```
 
-### MTR by Analyst
+### TTC by Analyst
 
 ```{r, eval = if_mtr_exists, out.width='100%'}
 ggplotly(
   tooltip = c("x", "y"),
-  mtr_by_user %>%
-    ggplot(aes(x=assigned_user, y=MTR, fill=assigned_user)) +
+  ttc_by_user %>%
+    ggplot(aes(x=assigned_user, y=MTC, fill=assigned_user)) +
     geom_bar(stat="identity")
 )
 ```
@@ -320,57 +334,17 @@ ggplotly(
 ### Table (Raw Data)
 
 ```{r, eval = if_mtr_exists, out.width='100%'}
-mtr_df %>%
+mtc_df %>%
   mutate_if(is.numeric, funs(round(.,2))) %>%
   table()
 ```
 
 ## Download
 
-Click the button below to save the latest MTR data as a `.csv`.
+Click the button below to save the latest MTC data as a `.csv`.
 
 ```{r, eval = if_mtr_exists}
-write_csv(mtr_df, "../data/mtr.csv")
+write_csv(mtc_df, "../data/mtc_df.csv")
 ```
 
-<a id = "button" download="mta.csv" href="../data/mta.csv">Download</a>
-
-## Outcome Analysis {.tabset}
-
-Here you can see the most frequent details for each closure outcome type.
-
-```{r}
-outcomes <- mtr_df %>%
-  separate(outcome, into=c("outcome", "details"), sep=" ", extra="merge") %>%
-  mutate(details = tolower(details))
-```
-
-### BTP Details
-```{r}
-outcomes %>%
-  filter(custom_grep("btp", outcome)) %>%
-  group_by(details) %>%
-  summarize(n = n(), .groups="keep") %>%
-  arrange(-n) %>%
-  table()
-```
-
-### MTP Details
-```{r}
-outcomes %>%
-  filter(custom_grep("mtp", outcome)) %>%
-  group_by(details) %>%
-  summarize(n = n(), .groups="keep") %>%
-  arrange(-n) %>%
-  table()
-```
-
-### FP Details
-```{r}
-outcomes %>%
-  filter(custom_grep("fp", outcome)) %>%
-  group_by(details) %>%
-  summarize(n = n(), .groups="keep") %>%
-  arrange(-n) %>%
-  table()
-```
+<a id = "button" download="mtc_df.csv" href="../data/mtc_df.csv">Download</a>

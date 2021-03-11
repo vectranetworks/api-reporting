@@ -1,5 +1,5 @@
 ---
-title: "Time to Detect (TTD)"
+title: "Time to Acknowledge (TTA)"
 output:
   html_document:
     css: "style.css"
@@ -19,18 +19,18 @@ source("functions.R")
 # Options, configs, themes
 options("warn"=-1)
 theme_set(theme_minimal())
-mtd_goal <- read_yaml("../config.yaml")$goals$mtd
+MTA_goal <- read_yaml("../config.yaml")$goals$mta
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-`Mean Time to Detect` is the average time it took for a detection created by Cognito to be assigned to a cybersecurity analyst.
+`Mean Time to Acknowledge` is the average time it took for a detection created by Cognito to be assigned to a cybersecurity analyst.
 
 This represents the very first step in the process: a detection is triggered and a human is assigned to deal with it.
 
 ```{r}
 notes_df <- read_log("../logs/notes.csv")
 
-if_mti_exists <-
+if_data_exists <-
   notes_df %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   check_data()
@@ -38,17 +38,21 @@ if_mti_exists <-
 btp <- "0%"; mtp <- "0%"; fp <- "0%"
 ```
 
-```{r, eval = if_mti_exists}
+```{r, eval = !if_data_exists, out.width='100%'}
+msg <- "No data yet!\nAssign a detection to an analyst\n to see this page populate."
+par(mar = c(0,0,0,0))
+plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
+```
+
+
+## Top-Level Stats {.tabset}
+
+```{r, eval = if_data_exists}
 rm(btp, mtp, fp)
 
-closures <- 
-  read_log("../logs/new_notes.csv") %>%
+ts <- read_log("../logs/new_notes.csv") %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
-  mutate(
-    btp = ifelse(custom_grep("btp", note), 1, 0),
-    mtp = ifelse(custom_grep("mtp", note), 1, 0),
-    fp = ifelse(custom_grep("fp", note), 1, 0)
-  ) %>%
   unique()
 
 #####
@@ -56,22 +60,19 @@ closures <-
 #####
 
 # Current
-c_w <- this_time(closures, "week") %>% list_top_stats()
-c_m <- this_time(closures, "month") %>% list_top_stats()
-c_q <- this_time(closures, "quarter") %>% list_top_stats()
+c_w <- this_time(ts, "week") %>% top_stats()
+c_m <- this_time(ts, "month") %>% top_stats()
+c_q <- this_time(ts, "quarter") %>% top_stats()
 
 # Last
-l_w <- last_time(closures, "week") %>% list_top_stats()
-l_m <- last_time(closures, "month") %>% list_top_stats()
-l_q <- last_time(closures, "quarter") %>% list_top_stats()
-
+l_w <- last_time(ts, "week") %>% top_stats()
+l_m <- last_time(ts, "month") %>% top_stats()
+l_q <- last_time(ts, "quarter") %>% top_stats()
 ```
-
-## Top-Level Stats {.tabset}
 
 ### This Week
 
-<div style="height:70px;" id="closed_w">
+<div style="height:90px;" id="closed_w">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -83,6 +84,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r c_w$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r c_w$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r c_w$b`)</div>
+  <div id="stat-col">(`r c_w$m`)</div>
+  <div id="stat-col">(`r c_w$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed this week: <b> `r c_w$n` </b> </i>
 </div>
@@ -92,7 +100,7 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ### Last Week
 
-<div style="height:70px;" id="closed_w">
+<div style="height:90px;" id="closed_w">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -104,6 +112,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r l_w$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r l_w$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r l_w$b`)</div>
+  <div id="stat-col">(`r l_w$m`)</div>
+  <div id="stat-col">(`r l_w$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed last week: <b> `r l_w$n` </b> </i>
 </div>
@@ -113,7 +128,7 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ### This Month
 
-<div style="height:70px;" id="closed_m">
+<div style="height:90px;" id="closed_m">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -125,6 +140,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r c_m$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r c_m$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r c_m$b`)</div>
+  <div id="stat-col">(`r c_m$m`)</div>
+  <div id="stat-col">(`r c_m$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed this month: <b> `r c_m$n` </b> </i>
 </div>
@@ -134,7 +156,7 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ### Last Month
 
-<div style="height:70px;" id="closed_m">
+<div style="height:90px;" id="closed_m">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -146,6 +168,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r l_m$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r l_m$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r l_m$b`)</div>
+  <div id="stat-col">(`r l_m$m`)</div>
+  <div id="stat-col">(`r l_m$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed last month: <b> `r l_m$n` </b> </i>
 </div>
@@ -155,7 +184,7 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ### This Quarter
 
-<div style="height:70px;" id="closed_q">
+<div style="height:90px;" id="closed_q">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -167,6 +196,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r c_q$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r c_q$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r c_q$b`)</div>
+  <div id="stat-col">(`r c_q$m`)</div>
+  <div id="stat-col">(`r c_q$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed this quarter: <b> `r c_q$n` </b> </i>
 </div>
@@ -176,7 +212,7 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ### Last Quarter
 
-<div style="height:70px;" id="closed_q">
+<div style="height:90px;" id="closed_q">
 <div>
   <div id="stat-col">Malicious true positives</div>
   <div id="stat-col">Benign true positives</div>
@@ -188,6 +224,13 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
   <div id="stat-col"> <a id="stat"> `r l_q$btp` </a> </div>
   <div id="stat-col"> <a id="stat"> `r l_q$fp` </a> </div>
 </div>
+
+<div>
+  <div id="stat-col">(`r l_q$b`)</div>
+  <div id="stat-col">(`r l_q$m`)</div>
+  <div id="stat-col">(`r l_q$f`)</div>
+</div>
+
 <div style="float: right;">
   <i> Total detections closed last quarter: <b> `r l_q$n` </b> </i>
 </div>
@@ -195,68 +238,61 @@ l_q <- last_time(closures, "quarter") %>% list_top_stats()
 
 ***
 
+## Data {.tabset}
+
 ```{r load-data, include=FALSE}
 assigned <- read_log("../logs/assigned.csv")
 ```
 
 ```{r}
-# MTD is all based on assigned date
-mtd <- "(no data yet)"
-mtd_under <- "(no data yet)"
+# MTA is all based on assigned date
+MTA <- "(no data yet)"
+MTA_under <- "(no data yet)"
 
-mtd_df <- assigned %>%
+MTA_df <- assigned %>%
   select(fired, assigned_date) %>%
   filter(!is.na(assigned_date)) %>%
-  mutate(td = as.double(assigned_date - fired, units="hours"))
+  mutate(TA = as.double(assigned_date - fired, units="hours"))
 
-if_data_exists <- check_data(mtd_df)
+if_data_exists <- check_data(MTA_df)
 ```
 
 ```{r, eval=if_data_exists}
-mtd <- mean(mtd_df$td) %>% round(2)
+MTA <- mean(MTA_df$TA) %>% round(2)
 
-mtd_under <- mtd_df %>%
-  mutate(under_goal = ifelse(td<=mtd_goal,1,0)) %$%
+MTA_under <- MTA_df %>%
+  mutate(under_goal = ifelse(TA<=MTA_goal,1,0)) %$%
   mean(under_goal) %>%
   (function(x) paste0(round(x*100,2),"%"))
 
-df <- mtd_df %>%
+df <- MTA_df %>%
   group_by(Day = as.Date(cut(fired, "day"))) %>%
-  summarize(MTD = mean(td), .groups="keep")
+  summarize(MTA = mean(TA), .groups="keep")
 ```
 
-```{r, eval = !if_data_exists, out.width='100%'}
-msg <- "No data yet!\nAssign a detection to an analyst\n to see this page populate."
-par(mar = c(0,0,0,0))
-plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
-```
+**Goal**: MTA of under `r MTA_goal` hours. **The overall mean time to acknowledge was `r MTA` hours.**
 
-## Data {.tabset}
+**`r MTA_under`** of detections had an MTA below the goal.
 
-**Goal**: MTD of under `r mtd_goal` hours. **The overall mean time to detect was `r mtd` hours.**
-
-**`r mtd_under`** of detections had an MTD below the goal.
-
-### Daily MTD (Line)
+### Daily MTA (Line)
 
 ```{r, eval=if_data_exists, out.width='100%'}
 ggplotly(
   ggplot(df) +
-  geom_point(aes(x=Day, y=MTD)) +
-  geom_hline(aes(yintercept=mtd_goal), color="red") +
-  geom_line(aes(x=Day, y=MTD))
+  geom_point(aes(x=Day, y=MTA)) +
+  geom_hline(aes(yintercept=MTA_goal), color="red") +
+  geom_line(aes(x=Day, y=MTA))
 )
 ```
 
-### Daily MTD (Trend)
+### Daily MTA (Trend)
 
 ```{r, eval=if_data_exists, out.width='100%'}
 ggplotly(
   ggplot(df) +
-  geom_hline(aes(yintercept=mtd_goal), color="red") +
-  geom_smooth(aes(x=Day, y=MTD), formula = y ~ x, method = "loess") +
-  geom_point(aes(x=Day, y=MTD))
+  geom_hline(aes(yintercept=MTA_goal), color="red") +
+  geom_smooth(aes(x=Day, y=MTA), formula = y ~ x, method = "loess") +
+  geom_point(aes(x=Day, y=MTA))
 )
 ```
 
@@ -267,7 +303,7 @@ ggplotly(
 ```{r, eval=if_data_exists, out.width='100%'}
 ggplotly(
   tooltip = c("x","y"),
-  ggplot(df, aes(x=MTD)) +
+  ggplot(df, aes(x=MTA)) +
   geom_histogram(bins=10, aes(fill=after_stat(count)))
 )
 ```
@@ -283,11 +319,11 @@ assigned %>%
 
 ## Download
 
-Click the button below to save the latest MTD data as a `.csv`.
+Click the button below to save the latest MTA data as a `.csv`.
 
 ```{r, eval=if_data_exists}
-write_csv(df, "../data/mtd.csv")
+write_csv(df, "../data/MTA.csv")
 ```
 
-<a id="button" download="mtd.csv" href="../data/mtd.csv">Download</a>
+<a id="button" download="MTA.csv" href="../data/MTA.csv">Download</a>
 <div class="spacer"></div>
