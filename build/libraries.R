@@ -21,3 +21,4 @@ lapply(libs, function(...){
 })
 
 options(warn=-1)
+options("scipen"=100)
