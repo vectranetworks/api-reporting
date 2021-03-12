@@ -1,5 +1,5 @@
 ---
-title: "Mean Time to Close (MTC)"
+title: "Time to Close (TTC)"
 output:
   html_document:
     css: "style.css"
@@ -82,8 +82,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r c_w$b`)</div>
   <div id="stat-col">(`r c_w$m`)</div>
+  <div id="stat-col">(`r c_w$b`)</div>
   <div id="stat-col">(`r c_w$f`)</div>
 </div>
 
@@ -110,8 +110,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r l_w$b`)</div>
   <div id="stat-col">(`r l_w$m`)</div>
+  <div id="stat-col">(`r l_w$b`)</div>
   <div id="stat-col">(`r l_w$f`)</div>
 </div>
 
@@ -138,8 +138,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r c_m$b`)</div>
   <div id="stat-col">(`r c_m$m`)</div>
+  <div id="stat-col">(`r c_m$b`)</div>
   <div id="stat-col">(`r c_m$f`)</div>
 </div>
 
@@ -166,8 +166,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r l_m$b`)</div>
   <div id="stat-col">(`r l_m$m`)</div>
+  <div id="stat-col">(`r l_m$b`)</div>
   <div id="stat-col">(`r l_m$f`)</div>
 </div>
 
@@ -194,8 +194,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r c_q$b`)</div>
   <div id="stat-col">(`r c_q$m`)</div>
+  <div id="stat-col">(`r c_q$b`)</div>
   <div id="stat-col">(`r c_q$f`)</div>
 </div>
 
@@ -222,8 +222,8 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 </div>
 
 <div>
-  <div id="stat-col">(`r l_q$b`)</div>
   <div id="stat-col">(`r l_q$m`)</div>
+  <div id="stat-col">(`r l_q$b`)</div>
   <div id="stat-col">(`r l_q$f`)</div>
 </div>
 
