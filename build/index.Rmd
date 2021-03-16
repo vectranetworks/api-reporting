@@ -47,9 +47,6 @@ ggplotly(
 
 ### Hosts Observed
 ```{r, out.width='100%'}
-fake_hod <- hod %>% add_row(date=today(), hosts_observed=10000, hosts_w_detections=50)
-# confirmed this chart can go to 10,000
-
 ggplotly(
   tooltip = c("x", "y", "group"),
   melt(hod, id.vars="date", value.name="Count", variable.name="Metric") %>%
@@ -72,21 +69,18 @@ c_q <- vis_this_time(h,a,"month")
 l_w <- vis_last_time(h,a,"week")
 l_m <- vis_last_time(h,a,"month")
 l_q <- vis_last_time(h,a,"quarter")
-
-ho <- length(unique(h$ip))
-d <- length(unique(a$id))
-hwd <- filter(h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow()
-crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 ```
 
 ### This Week
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -96,6 +90,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r c_w$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_w$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_w$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_w$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -108,12 +104,14 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 ### Last Week
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -123,6 +121,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r l_w$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_w$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_w$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_w$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -135,12 +135,14 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 ### This Month
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -150,6 +152,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r c_m$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_m$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_m$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_m$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -162,12 +166,14 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 ### Last Month
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -177,6 +183,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r l_m$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_m$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_m$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_m$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -189,12 +197,14 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 ### This Quarter
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -204,6 +214,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r c_q$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_q$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_q$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_q$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -216,12 +228,14 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 ### Last Quarter
 
-<div style="height:70px;">
+<div style="height:90px;">
 
 <div>
   <div id="w-label">Hosts Observed</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Untriaged Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -231,6 +245,8 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   <div id="w-label"> <a id="stat"> `r l_q$ho` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_q$d` </a> </div>
+  <div id="w-arrow"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_q$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_q$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
@@ -245,7 +261,7 @@ crit <- filter(h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
 
 Here you can see current metrics for hosts. If you'd like to look at how these values have changed historically, see the download section below.
 
-```{r, out.width='100%'}
+```{r, out.width='100%', eval=FALSE}
 current_h <- h %>% 
   group_by(ip) %>%
   slice(which.max(last_detection_timestamp))

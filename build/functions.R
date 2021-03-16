@@ -68,7 +68,8 @@ api_format <- function(df, object) {
         fired = first_timestamp,
         note_date = note_modified_timestamp,
         note_user = note_modified_by,
-        assigned_user = assigned_to
+        assigned_user = assigned_to,
+        triaged = triage_rule_id
       ) %>%
       mutate(
         fired = api_date(fired),
@@ -76,7 +77,8 @@ api_format <- function(df, object) {
         note_date = api_date(note_date),
         assigned_user = as.character(assigned_user),
         note_user = as.character(note_user),
-        note = as.character(note)
+        note = as.character(note),
+        triaged = ifelse(!is.na(triaged), TRUE, FALSE)
       ) %>%
       arrange(fired)
     
@@ -181,6 +183,7 @@ list_vis_stats <- function(sub_h, sub_a){
   list(
     "ho" = length(unique(sub_h$ip)),
     "d" = length(unique(sub_a$id)),
+    "d_no_t" = filter(sub_a, triaged==FALSE) %>% select(id) %>% unique() %>% nrow(),
     "hwd" = filter(sub_h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow(),
     "crit" = filter(sub_h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
   )
