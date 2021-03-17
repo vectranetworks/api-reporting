@@ -341,14 +341,14 @@ write_csv(mtr_df, "../data/mtr.csv")
 
 Here you can see the most frequent details for each closure outcome type.
 
-```{r}
+```{r, eval = if_mtr_exists}
 outcomes <- mtr_df %>%
   separate(outcome, into=c("outcome", "details"), sep=" ", extra="merge") %>%
   mutate(details = tolower(details))
 ```
 
 ### BTP Details
-```{r}
+```{r, eval = if_mtr_exists}
 outcomes %>%
   filter(custom_grep("btp", outcome)) %>%
   group_by(details) %>%
@@ -358,7 +358,7 @@ outcomes %>%
 ```
 
 ### MTP Details
-```{r}
+```{r, eval = if_mtr_exists}
 outcomes %>%
   filter(custom_grep("mtp", outcome)) %>%
   group_by(details) %>%
@@ -368,7 +368,7 @@ outcomes %>%
 ```
 
 ### FP Details
-```{r}
+```{r, eval = if_mtr_exists}
 outcomes %>%
   filter(custom_grep("fp", outcome)) %>%
   group_by(details) %>%
