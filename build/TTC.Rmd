@@ -30,13 +30,15 @@ knitr::opts_chunk$set(echo = FALSE)
 ```{r data-check}
 mtr <- "(no data yet)"
 mtr_under <- "(no data yet)"
-btp <- "0%"; mtp <- "0%"; fp <- "0%"
 
 # Check if closure notes exist
 if_mtr_exists <-
   notes_df %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   check_data()
+
+c_w <- c_m <- c_q <- l_w <- l_m <- l_q <- 
+  tibble("b"=0, "m"=0, "f"=0, "n"=0, "btp"=0, "mtp"=0, "fp"=0)
 ```
 
 
