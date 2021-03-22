@@ -2,14 +2,14 @@
 
 cat("Calling API...")
 
-d_fields <- "id,first_timestamp,assigned_date,assigned_to,note_modified_timestamp,note_modified_by,note,triage_rule_id"
+d_fields <- "id,src_ip,first_timestamp,assigned_date,assigned_to,note_modified_timestamp,note_modified_by,note,triage_rule_id,detection_category"
 h_fields <- "id,name,ip,threat,certainty,severity,last_detection_timestamp"
 
 d <- api_call(d_fields, "detections") %>% api_format("d")
 h <- api_call(h_fields, "hosts") %>% api_format("h")
 hm <- h %>% api_format("hm")
 
-assigned_df <- select(d, id, fired, assigned_date, assigned_user, triaged)
+assigned_df <- select(d, id, src_ip, fired, assigned_date, assigned_user, triaged, type)
 note_df <- select(d, id, fired, note_date, note_user, note)
 
 cat("Done\n")

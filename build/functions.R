@@ -69,7 +69,8 @@ api_format <- function(df, object) {
         note_date = note_modified_timestamp,
         note_user = note_modified_by,
         assigned_user = assigned_to,
-        triaged = triage_rule_id
+        triaged = triage_rule_id,
+        type = detection_category
       ) %>%
       mutate(
         fired = api_date(fired),
@@ -179,24 +180,31 @@ percentify <- function(num, n) {
 
 ### Visbility Workload Reduction
 
-list_vis_stats <- function(sub_h, sub_a){
+list_vis_stats <- function(sub_h, sub_a, sub_hm, sub_n){
   list(
     "ho" = length(unique(sub_h$ip)),
     "d" = length(unique(sub_a$id)),
     "d_no_t" = filter(sub_a, triaged==FALSE) %>% select(id) %>% unique() %>% nrow(),
+    "d_no_info" = filter(sub_a, triaged==FALSE, !grepl("INFO",type)) %>% select(id) %>% unique() %>% nrow(),
+    "closed" = filter(sub_n, custom_grep("btp|mtp|fp", note)) %>% select(id) %>% unique() %>% nrow(),
     "hwd" = filter(sub_h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow(),
-    "crit" = filter(sub_h, severity=="critical") %>% select(ip) %>% unique() %>% nrow()
+    "crit" = round(mean(sub_hm$critical),1),
+    "high" = round(mean(sub_hm$high),1),
+    "medium" = round(mean(sub_hm$medium),1),
+    "low" = round(mean(sub_hm$low),1)
   )
 }
 
-vis_this_time <- function(h, a, time){
+vis_this_time <- function(h, a, hm, n, time){
   sub_h <- filter(h, floor_date(last_detection_timestamp, unit=time) == floor_date(today(), unit=time))
   sub_a <- filter(a, floor_date(fired, time) == floor_date(today(), unit=time))
+  sub_hm <- filter(hm, floor_date(date, time) == floor_date(today(), unit=time))
+  sub_n <- filter(n, floor_date(note_date, time) == floor_date(today(), unit=time))
   
-  list_vis_stats(sub_h, sub_a)
+  list_vis_stats(sub_h, sub_a, sub_hm, sub_n)
 }
 
-vis_last_time <- function(h, a, time){
+vis_last_time <- function(h, a, hm, n, time){
   if (time != "quarter") {
     previous <- floor_date(today(),time) - match.fun(paste0(time,"s"))(1)
   } else {
@@ -205,8 +213,10 @@ vis_last_time <- function(h, a, time){
   
   sub_h <- filter(h, floor_date(last_detection_timestamp, time)==previous)
   sub_a <- filter(a, floor_date(fired, time)==previous)
+  sub_hm <- filter(hm, floor_date(date, time) == previous)
+  sub_n <- filter(n, floor_date(note_date, time) == previous)
   
-  list_vis_stats(sub_h, sub_a)
+  list_vis_stats(sub_h, sub_a, sub_hm, sub_n)
 }
 
 ### TTD & TTR Top Stats
