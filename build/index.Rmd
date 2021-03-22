@@ -78,9 +78,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -89,11 +89,11 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_w$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_w$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_w$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r c_w$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_w$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_w$high`, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
@@ -109,9 +109,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -120,11 +120,11 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_w$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_w$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_w$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r l_w$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_w$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_w$high`, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
@@ -140,9 +140,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -151,14 +151,14 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_m$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_m$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_m$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r c_m$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_m$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_m$high`, </a> </div>
-  <div id="w-arrow" style="color:white;" > ⟶ </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_m$crit`) </a> </div>
 </div>
 
@@ -171,9 +171,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -182,11 +182,11 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_m$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_m$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_m$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r l_m$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_m$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_m$high`, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
@@ -202,9 +202,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -213,11 +213,11 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_q$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_q$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_q$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r c_q$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r c_q$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r c_q$high`, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
@@ -233,9 +233,9 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 <div style="height:90px;">
 
 <div>
-  <div id="w-label">Hosts Observed</div>
-  <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Hosts with Detections</div>
+  <div id="w-arrow"> ⠀⠀</div>
+  <div id="w-label">Avg. Low Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
   <div id="w-label">Avg. Medium Hosts</div>
   <div id="w-arrow"> ⠀⠀</div>
@@ -244,11 +244,11 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_q$ho` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_q$hwd` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_q$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> (`r l_q$low`, </a> </div>
+  <div id="w-arrow" style="color:white;"> ⟶ </div>
+  <div id="w-label"> <a id="stat"> `r l_q$medium`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
   <div id="w-label"> <a id="stat"> `r l_q$high`, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
