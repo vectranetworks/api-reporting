@@ -64,76 +64,13 @@ ggplotly(
 Here you can see the overall workload reduction Cognito has produced for you. Metrics are filterable for different time periods.
 
 ```{r}
-c_w <- vis_this_time(h,a,hm,n,"week")
 c_m <- vis_this_time(h,a,hm,n,"month")
 c_q <- vis_this_time(h,a,hm,n,"month")
 
-l_w <- vis_last_time(h,a,hm,n,"week")
 l_m <- vis_last_time(h,a,hm,n,"month")
 l_q <- vis_last_time(h,a,hm,n,"quarter")
 ```
 
-### This Week
-
-<div style="height:90px;">
-
-<div>
-  <div id="w-label">Hosts with Detections</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Low Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Medium Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. High Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Critical Hosts</div>
-</div>
-<div>
-  <div id="w-label"> <a id="stat"> `r c_w$hwd` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_w$low`, </a> </div>
-  <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$medium`, </a> </div>
-  <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$high`, </a> </div>
-  <div id="w-arrow" style="color:white;" > ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$crit`) </a> </div>
-</div>
-
-</div>
-
-***
-
-### Last Week
-
-<div style="height:90px;">
-
-<div>
-  <div id="w-label">Hosts with Detections</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Low Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Medium Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. High Hosts</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Avg. Critical Hosts</div>
-</div>
-<div>
-  <div id="w-label"> <a id="stat"> `r l_w$hwd` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_w$low`, </a> </div>
-  <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$medium`, </a> </div>
-  <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$high`, </a> </div>
-  <div id="w-arrow" style="color:white;" > ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$crit`) </a> </div>
-</div>
-
-</div>
-
-***
 
 ### This Month
 

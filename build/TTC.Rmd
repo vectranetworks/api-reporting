@@ -58,71 +58,13 @@ ts <- read_log("../logs/new_notes.csv") %>%
 #####
 
 # Current
-c_w <- this_time(ts, "week") %>% top_stats()
 c_m <- this_time(ts, "month") %>% top_stats()
 c_q <- this_time(ts, "quarter") %>% top_stats()
 
 # Last
-l_w <- last_time(ts, "week") %>% top_stats()
 l_m <- last_time(ts, "month") %>% top_stats()
 l_q <- last_time(ts, "quarter") %>% top_stats()
 ```
-
-### This Week
-
-<div style="height:90px;" id="closed_w">
-<div>
-  <div id="stat-col">Malicious true positives</div>
-  <div id="stat-col">Benign true positives</div>
-  <div id="stat-col">False positives</div>
-</div>
-
-<div>
-  <div id="stat-col"> <a id="stat"> `r c_w$mtp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r c_w$btp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r c_w$fp` </a> </div>
-</div>
-
-<div>
-  <div id="stat-col">(`r c_w$m`)</div>
-  <div id="stat-col">(`r c_w$b`)</div>
-  <div id="stat-col">(`r c_w$f`)</div>
-</div>
-
-<div style="float: right;">
-  <i> Total detections closed this week: <b> `r c_w$n` </b> </i>
-</div>
-</div>
-
-***
-
-### Last Week
-
-<div style="height:90px;" id="closed_w">
-<div>
-  <div id="stat-col">Malicious true positives</div>
-  <div id="stat-col">Benign true positives</div>
-  <div id="stat-col">False positives</div>
-</div>
-
-<div>
-  <div id="stat-col"> <a id="stat"> `r l_w$mtp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r l_w$btp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r l_w$fp` </a> </div>
-</div>
-
-<div>
-  <div id="stat-col">(`r l_w$m`)</div>
-  <div id="stat-col">(`r l_w$b`)</div>
-  <div id="stat-col">(`r l_w$f`)</div>
-</div>
-
-<div style="float: right;">
-  <i> Total detections closed last week: <b> `r l_w$n` </b> </i>
-</div>
-</div>
-
-***
 
 ### This Month
 
@@ -247,78 +189,13 @@ n <- read_log("../logs/notes.csv")
 s <- hm %>% select(date, low, medium, high, critical)
 hod <- hm %>% select(date, hosts_observed, hosts_w_detections)
 
-c_w <- vis_this_time(h,a,hm,n,"week")
 c_m <- vis_this_time(h,a,hm,n,"month")
 c_q <- vis_this_time(h,a,hm,n,"month")
 
-l_w <- vis_last_time(h,a,hm,n,"week")
 l_m <- vis_last_time(h,a,hm,n,"month")
 l_q <- vis_last_time(h,a,hm,n,"quarter")
 ```
 
-### This Week
-
-
-<div style="height:90px;">
-
-<div>
-  <div id="w-label">Detections</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Un-Triaged</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Non-Info</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Closed</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Percent Closed</div>
-</div>
-<div>
-  <div id="w-label"> <a id="stat"> `r c_w$d` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$d_no_t` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$d_no_info` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_w$closed` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(c_w$closed / c_w$d_no_info,2)*100,"%")` </a> </div>
-
-</div>
-
-</div>
-
-***
-
-### Last Week
-
-<div style="height:90px;">
-
-<div>
-  <div id="w-label">Detections</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Un-Triaged</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Non-Info</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Closed</div>
-  <div id="w-arrow"> ⠀⠀</div>
-  <div id="w-label">Percent Closed</div>
-</div>
-<div>
-  <div id="w-label"> <a id="stat"> `r l_w$d` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$d_no_t` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$d_no_info` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_w$closed` </a> </div>
-  <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(l_w$closed / l_w$d_no_info,2)*100,"%")` </a> </div>
-</div>
-
-</div>
-
-***
 
 ### This Month
 

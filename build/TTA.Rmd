@@ -61,71 +61,14 @@ ts <- read_log("../logs/new_notes.csv") %>%
 #####
 
 # Current
-c_w <- this_time(ts, "week") %>% top_stats()
 c_m <- this_time(ts, "month") %>% top_stats()
 c_q <- this_time(ts, "quarter") %>% top_stats()
 
 # Last
-l_w <- last_time(ts, "week") %>% top_stats()
 l_m <- last_time(ts, "month") %>% top_stats()
 l_q <- last_time(ts, "quarter") %>% top_stats()
 ```
 
-### This Week
-
-<div style="height:90px;" id="closed_w">
-<div>
-  <div id="stat-col">Malicious true positives</div>
-  <div id="stat-col">Benign true positives</div>
-  <div id="stat-col">False positives</div>
-</div>
-
-<div>
-  <div id="stat-col"> <a id="stat"> `r c_w$mtp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r c_w$btp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r c_w$fp` </a> </div>
-</div>
-
-<div>
-  <div id="stat-col">(`r c_w$m`)</div>
-  <div id="stat-col">(`r c_w$b`)</div>
-  <div id="stat-col">(`r c_w$f`)</div>
-</div>
-
-<div style="float: right;">
-  <i> Total detections closed this week: <b> `r c_w$n` </b> </i>
-</div>
-</div>
-
-***
-
-### Last Week
-
-<div style="height:90px;" id="closed_w">
-<div>
-  <div id="stat-col">Malicious true positives</div>
-  <div id="stat-col">Benign true positives</div>
-  <div id="stat-col">False positives</div>
-</div>
-
-<div>
-  <div id="stat-col"> <a id="stat"> `r l_w$mtp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r l_w$btp` </a> </div>
-  <div id="stat-col"> <a id="stat"> `r l_w$fp` </a> </div>
-</div>
-
-<div>
-  <div id="stat-col">(`r l_w$m`)</div>
-  <div id="stat-col">(`r l_w$b`)</div>
-  <div id="stat-col">(`r l_w$f`)</div>
-</div>
-
-<div style="float: right;">
-  <i> Total detections closed last week: <b> `r l_w$n` </b> </i>
-</div>
-</div>
-
-***
 
 ### This Month
 
