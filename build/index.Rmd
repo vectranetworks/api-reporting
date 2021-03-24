@@ -88,7 +88,7 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_m$hwd` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_m$hwd2` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> (`r c_m$low`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
@@ -119,7 +119,7 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_m$hwd` </a> </div>
+  <div id="w-label"> <a id="stat"> `r l_m$hwd2` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> (`r l_m$low`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
@@ -150,7 +150,7 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_q$hwd` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_q$hwd2` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> (`r c_q$low`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
@@ -181,7 +181,7 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_q$hwd` </a> </div>
+  <div id="w-label"> <a id="stat"> `r l_q$hwd2` </a> </div>
   <div id="w-arrow"> ⟶ </div>
   <div id="w-label"> <a id="stat"> (`r l_q$low`, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>

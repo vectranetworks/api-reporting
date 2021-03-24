@@ -188,6 +188,7 @@ list_vis_stats <- function(sub_h, sub_a, sub_hm, sub_n){
     "d_no_info" = filter(sub_a, triaged==FALSE, !grepl("INFO",type)) %>% select(id) %>% unique() %>% nrow(),
     "closed" = filter(sub_n, custom_grep("btp|mtp|fp", note)) %>% select(id) %>% unique() %>% nrow(),
     "hwd" = filter(sub_h, !is.na(severity)) %>% select(ip) %>% unique() %>% nrow(),
+	 "hwd2" = round(mean(sub_hm$critical + sub_hm$high + sub_hm$medium + sub_hm$low),1),
     "crit" = round(mean(sub_hm$critical),1),
     "high" = round(mean(sub_hm$high),1),
     "medium" = round(mean(sub_hm$medium),1),
