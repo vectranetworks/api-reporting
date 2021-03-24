@@ -189,11 +189,11 @@ n <- read_log("../logs/notes.csv")
 s <- hm %>% select(date, low, medium, high, critical)
 hod <- hm %>% select(date, hosts_observed, hosts_w_detections)
 
-c_m <- vis_this_time(h,a,hm,n,"month")
-c_q <- vis_this_time(h,a,hm,n,"month")
+v_c_m <- vis_this_time(h,a,hm,n,"month")
+v_c_q <- vis_this_time(h,a,hm,n,"month")
 
-l_m <- vis_last_time(h,a,hm,n,"month")
-l_q <- vis_last_time(h,a,hm,n,"quarter")
+v_l_m <- vis_last_time(h,a,hm,n,"month")
+v_l_q <- vis_last_time(h,a,hm,n,"quarter")
 ```
 
 
@@ -213,15 +213,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Percent Closed</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_m$d` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_m$d` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$d_no_t` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_m$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$d_no_info` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_m$d_no_info` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$closed` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_m$n` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(c_m$closed / c_m$d_no_info,2)*100,"%")` </a> </div>
+  <div id="w-label"> <a id="stat"> `r paste0(round(c_m$n / v_c_m$d_no_info,2)*100,"%")` </a> </div>
 </div>
 
 </div>
@@ -244,15 +244,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Percent Closed</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_m$d` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_m$d` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$d_no_t` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_m$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$d_no_info` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_m$d_no_info` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$closed` </a> </div>
+  <div id="w-label"> <a id="stat"> `r l_m$n` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(l_m$closed / l_m$d_no_info,2)*100,"%")` </a> </div>
+  <div id="w-label"> <a id="stat"> `r paste0(round(l_m$n / v_l_m$d_no_info,2)*100,"%")` </a> </div>
 </div>
 
 </div>
@@ -275,15 +275,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Percent Closed</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_q$d` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_q$d` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$d_no_t` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_q$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$d_no_info` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_c_q$d_no_info` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$closed` </a> </div>
+  <div id="w-label"> <a id="stat"> `r c_q$n` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(c_q$closed / c_q$d_no_info,2)*100,"%")` </a> </div>
+  <div id="w-label"> <a id="stat"> `r paste0(round(c_q$n / v_c_q$d_no_info,2)*100,"%")` </a> </div>
 </div>
 
 </div>
@@ -306,15 +306,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Percent Closed</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_q$d` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_q$d` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$d_no_t` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_q$d_no_t` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$d_no_info` </a> </div>
+  <div id="w-label"> <a id="stat"> `r v_l_q$d_no_info` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$closed` </a> </div>
+  <div id="w-label"> <a id="stat"> `r l_q$n` </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r paste0(round(l_q$closed / l_q$d_no_info,2)*100,"%")` </a> </div>
+  <div id="w-label"> <a id="stat"> `r paste0(round(l_q$n / v_l_q$d_no_info,2)*100,"%")` </a> </div>
 </div>
 
 </div>
