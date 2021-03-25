@@ -213,7 +213,7 @@ l_q <- last_time(ts, "quarter") %>% top_stats()
 
 ## Time to Respond {.tabset}
 
-**Goal**: MTR of under `r mtr_goal` hours. **The overall mean time to detect was `r mtr` hours.**
+**Goal**: MTR of under `r mtr_goal` hours. **The overall mean time to respond was `r mtr` hours.**
 
 **`r mtr_under`** of detections had an MTR below the goal.
 
