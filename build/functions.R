@@ -109,7 +109,9 @@ api_format <- function(df, object) {
 # ---- Logging ----
 
 
-read_log <- function(file) read_csv(file, col_types = cols())
+read_log <- function(file) {
+  read_csv(file, col_types = cols(), guess_max=5000)
+}
 
 make_log <- function(df, file, delete=FALSE) {
   if (file.exists(file)) {
