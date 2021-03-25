@@ -106,48 +106,21 @@ api_format <- function(df, object) {
   }
 }
 
-csv_format <- function(f) {
-  switch(
-    f,
-    n = cols(
-      note_date = col_datetime(format = "%F %T"),
-      note_user = col_character(),
-      note = col_character()),
-    a = cols(
-      assigned_date = col_datetime(format = "%F %T"),
-      assigned_user = col_character()),
-    h = cols(
-      last_detection_timestamp = col_datetime(format = "%F %T")),
-    hm = cols(
-      date = col_datetime(format="%F %T"),
-      .default = col_integer())
-  )
-}
-
 # ---- Logging ----
 
-read_log <- function(file) {
-  if (grepl("notes",file)) read_csv(file, quote='"', col_types = csv_format("n"))
-  else if (grepl("assigned",file)) read_csv(file, col_types = csv_format("a"))
-  else if (grepl("hosts", file)) read_csv(file, col_types = csv_format("h"))
-  else if (grepl("metrics", file)) read_csv(file, col_types = csv_format("hm"))
-  else read_csv(file) # for testing purposes
-}
 
-write_log <- function(df, file) {
-  write.table(df, na="", file, sep=",", row.names=FALSE)
-}
+read_log <- function(file) read_csv(file, col_types = cols())
 
 make_log <- function(df, file, delete=FALSE) {
   if (file.exists(file)) {
-    old_rows <- read_log(file)
+    old_rows <- read_csv(file, col_types = cols())
     if (delete) {
       old_rows <- subset(old_rows, date != last(df$date))
     }
     new_rows <- anti_join(df, old_rows, by=colnames(df))
-    rbind(old_rows, new_rows) %>% write_log(file)
+    rbind(old_rows, new_rows) %>% write_csv(file)
   } else {
-    write_log(df, file) 
+    write_csv(df, file) 
   }
 }
 

@@ -52,7 +52,7 @@ text(x = 0.5, y = 0.5, msg, cex = 1.6, col = "black")
 ```{r, eval = if_data_exists}
 rm(btp, mtp, fp)
 
-ts <- read_log("../logs/new_notes.csv") %>%
+ts <- read_log("../logs/notes.csv") %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   unique()
 

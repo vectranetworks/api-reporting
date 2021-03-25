@@ -18,7 +18,7 @@ source("functions.R")
 
 # Data
 assigned_df <- read_log("../logs/assigned.csv")
-notes_df <- read_log("../logs/new_notes.csv")
+notes_df <- read_log("../logs/notes.csv")
 
 # Options, configs, themes
 theme_set(theme_minimal())
@@ -49,7 +49,7 @@ This page explores your company's `Time to Close (TTC)` metrics. Mean Time to Cl
 ```{r, eval = if_mtr_exists}
 rm(btp, mtp, fp)
 
-ts <- read_log("../logs/new_notes.csv") %>%
+ts <- read_log("../logs/notes.csv") %>%
   filter(custom_grep("btp|mtp|fp", note)) %>%
   unique()
 
