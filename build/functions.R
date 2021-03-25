@@ -108,9 +108,26 @@ api_format <- function(df, object) {
 
 # ---- Logging ----
 
+csv_format <- function(f) {
+  f %>% switch(
+    "../logs/notes.csv" = cols(
+      note_date = col_datetime(),
+      note_user = col_character(),
+      note = col_character()),
+    "../logs/assigned.csv" = cols(
+      assigned_date = col_datetime(),
+      assigned_user = col_character()),
+    "../logs/hosts.csv" = cols(
+      last_detection_timestamp = col_datetime()),
+    "../logs/host_metrics.csv" = cols(
+      date = col_datetime(),
+      .default = col_integer())
+  )
+}
+
 
 read_log <- function(file) {
-  read_csv(file, col_types = cols(), guess_max=5000)
+  read_csv(file, col_types = csv_format(file))
 }
 
 make_log <- function(df, file, delete=FALSE) {
