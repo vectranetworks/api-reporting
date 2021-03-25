@@ -190,7 +190,7 @@ s <- hm %>% select(date, low, medium, high, critical)
 hod <- hm %>% select(date, hosts_observed, hosts_w_detections)
 
 v_c_m <- vis_this_time(h,a,hm,n,"month")
-v_c_q <- vis_this_time(h,a,hm,n,"month")
+v_c_q <- vis_this_time(h,a,hm,n,"quarter")
 
 v_l_m <- vis_last_time(h,a,hm,n,"month")
 v_l_q <- vis_last_time(h,a,hm,n,"quarter")

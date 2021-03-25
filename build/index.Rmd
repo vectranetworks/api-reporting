@@ -53,7 +53,7 @@ Here you can see the overall workload reduction Cognito has produced for you. Me
 
 ```{r}
 c_m <- vis_this_time(h,a,hm,n,"month")
-c_q <- vis_this_time(h,a,hm,n,"month")
+c_q <- vis_this_time(h,a,hm,n,"quarter")
 
 l_m <- vis_last_time(h,a,hm,n,"month")
 l_q <- vis_last_time(h,a,hm,n,"quarter")
