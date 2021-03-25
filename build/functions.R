@@ -132,7 +132,7 @@ read_log <- function(file) {
 
 make_log <- function(df, file, delete=FALSE) {
   if (file.exists(file)) {
-    old_rows <- read_csv(file, col_types = cols())
+    old_rows <- read_log(file)
     if (delete) {
       old_rows <- subset(old_rows, date != last(df$date))
     }
