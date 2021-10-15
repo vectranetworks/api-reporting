@@ -1,6 +1,6 @@
 # ---- Get data from API -----
 
-cat("Calling API...")
+cat("Calling API (2.5k results per page)...")
 
 d_fields <- "id,src_ip,first_timestamp,assigned_date,assigned_to,note_modified_timestamp,note_modified_by,note,triage_rule_id,detection_category"
 h_fields <- "id,name,ip,threat,certainty,severity,last_detection_timestamp"

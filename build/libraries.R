@@ -1,6 +1,7 @@
 libs <- c(
   "httr",
   "jsonlite",
+  "purrr",
   "dplyr",
   "openssl",
   "tidyverse",

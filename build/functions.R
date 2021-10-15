@@ -5,37 +5,38 @@ get_creds <- function(){
             "Enter your credentials.", 
             "These are never stored on disk, just in the memory of this process.\n"
   ));
-  
-  cat("Enter DNS url: ");
-  readLines("stdin", n=1) %>% paste0("https://", ., "/api/v2.1/") %>% Sys.setenv("url"=.)
-  
+
+  cat("Enter DNS url (Application is using Cognito API v2.2): ");
+  readLines("stdin", n=1) %>% paste0("https://", ., "/api/v2.2/") %>% Sys.setenv("url"=.)
+
   cat("Enter Token: ");
   readLines("stdin", n=1) %>% Sys.setenv("token"=.)
 }
 
 api_call <- function(fields, object) {
-  
+
   # Setting arguments for get() below
   auth <- paste("Token ", Sys.getenv("token"))
   url <- paste0(Sys.getenv("url"), object)
-  
+
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
-  
-  query <- list("page_size"=5000)
+
+  query <- list("page_size"=2500)
   if (fields!="everything") query[["fields"]] <- fields
-  
+
+
   # Try api call 5 times if it fails
   # GET is an overlay to curl
   for(i in 1:5) {
     output <- GET(
       url = url,
       config = self_signed,
-      add_headers(Authorization = auth),
+      add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache"),
       query = query
     )
     if (output$status_code == 200) break
   }
-  
+
   # Handle invalid api call: error message and quit
   if (output$status_code != 200) {
     cat(paste(
@@ -45,13 +46,53 @@ api_call <- function(fields, object) {
     ))
     quit(save="yes")
   }
-  
+
   # Handle good api call: turn json to df
   output <- output %>% 
     content(as="text", encoding="UTF-8") %>%
     fromJSON(flatten=TRUE)
-  
+
+  url <- output[["next"]]
+  pageNo <- 1
+  message("\n", "Status: Got ", object, " page ", pageNo)
+
   output$results
+
+  while (!is.na(url) || !url == "") {
+    pageNo <- pageNo + 1
+    query <- list()
+
+    # Try api call 5 times if it fails
+    # GET is an overlay to curl
+    for (i in 1:5) {
+      partialOutput <- GET(
+        url = url,
+        config = self_signed,
+        add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache"),
+        query = query
+      )
+      if (partialOutput$status_code == 200) break
+    }
+
+    # Handle invalid api call: error message and quit
+    if (partialOutput$status_code != 200) {
+      cat(paste("\n\nAPI Fail: Status Code", partialOutput$status_code))
+      quit(save = "yes")
+    }
+
+    partialOutput <- partialOutput %>% 
+    content(as="text", encoding="UTF-8") %>%
+    fromJSON(flatten=TRUE)
+
+    url <- partialOutput[["next"]]
+    message("\r", "Status: Got ", object, " page ", pageNo)
+
+    partialOutput$results
+
+    output <- rbind(output, partialOutput)
+
+  }
+  message("\r", "Status: Finished getting ", object, ". Processing...")
 }
 
 # ---- Formatting ----
@@ -61,7 +102,7 @@ api_date <- function(x) {
 }
 
 api_format <- function(df, object) {
-  
+
   if(object == "d"){
     df %>%
       rename(
