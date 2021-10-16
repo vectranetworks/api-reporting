@@ -2,7 +2,7 @@
 # This is a config file that alters aspects of the site.
 
 # Site refresh frequency (in minutes)
-refresh: 10
+refresh: 720
 
 # Goals used in the MTD, MTA, & MTR charts
 goals:

@@ -18,13 +18,13 @@ api_call <- function(fields, object) {
   # Setting arguments for get() below
   auth <- paste("Token ", Sys.getenv("token"))
   url <- paste0(Sys.getenv("url"), object)
-
+  pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
 
   query <- list("page_size"=2500)
   if (fields!="everything") query[["fields"]] <- fields
 
-
+  cat("\n\n", "Getting ", object, " page ", pageNo,"...")
   # Try api call 5 times if it fails
   # GET is an overlay to curl
   for(i in 1:5) {
@@ -53,14 +53,16 @@ api_call <- function(fields, object) {
     fromJSON(flatten=TRUE)
 
   url <- output[["next"]]
-  pageNo <- 1
-  message("\n", "Status: Got ", object, " page ", pageNo)
 
   output$results
 
-  while (!is.na(url) || !url == "") {
+  os <- object.size(output)
+  cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
+
+  while (!is.null(url) & grepl("api", url)) {
     pageNo <- pageNo + 1
     query <- list()
+    cat("\n", "Getting ", object, " page ", pageNo,"...")
 
     # Try api call 5 times if it fails
     # GET is an overlay to curl
@@ -85,14 +87,15 @@ api_call <- function(fields, object) {
     fromJSON(flatten=TRUE)
 
     url <- partialOutput[["next"]]
-    message("\r", "Status: Got ", object, " page ", pageNo)
 
     partialOutput$results
 
     output <- rbind(output, partialOutput)
 
+      os <- object.size(output)
+      cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
   }
-  message("\r", "Status: Finished getting ", object, ". Processing...")
+  message("\n", "Status: Finished getting ", object, ". Processing...")
 }
 
 # ---- Formatting ----
