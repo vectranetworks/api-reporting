@@ -21,7 +21,7 @@ api_call <- function(fields, object) {
   pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
 
-  query <- list("page_size"=500)
+  query <- list("page_size"=2500)
   if (fields!="everything") query[["fields"]] <- fields
 
   cat("\n\n", "Getting ", object, " page ", pageNo,"...")
@@ -60,7 +60,7 @@ api_call <- function(fields, object) {
   os <- object.size(output)
   cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
 
-  while (length(url) > 0 & !is.null(url) & grepl("api", url) & pageNo < 6) {
+  while (length(url) > 0 & !is.null(url) & grepl("api", url)) {
     pageNo <- pageNo + 1
     query <- list()
     cat("\n", "Getting ", object, " page ", pageNo,"...")
@@ -96,7 +96,7 @@ api_call <- function(fields, object) {
     os <- object.size(output)
     cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
   }
-  
+
   message("\n", " Finished getting ", object, "! Processing ", recordCount, " records...")
 
   output
