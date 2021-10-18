@@ -12,11 +12,9 @@ hm <- h %>% api_format("hm")
 assigned_df <- select(d, id, src_ip, fired, assigned_date, assigned_user, triaged, type)
 note_df <- select(d, id, fired, note_date, note_user, note)
 
-cat("Done\n")
-
 # ---- Log API data into .csvs ----
 
-cat("Writing logs...")
+cat("\n\nWriting logs...")
 make_log(assigned_df, "../logs/assigned.csv")
 make_log(note_df, "../logs/notes.csv")
 make_log(h, "../logs/hosts.csv")

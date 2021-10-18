@@ -21,7 +21,7 @@ api_call <- function(fields, object) {
   pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
 
-  query <- list("page_size"=2500)
+  query <- list("page_size"=500)
   if (fields!="everything") query[["fields"]] <- fields
 
   cat("\n\n", "Getting ", object, " page ", pageNo,"...")
@@ -31,7 +31,7 @@ api_call <- function(fields, object) {
     output <- GET(
       url = url,
       config = self_signed,
-      add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache"),
+      add_headers(Authorization = auth),
       query = query
     )
     if (output$status_code == 200) break
@@ -53,13 +53,14 @@ api_call <- function(fields, object) {
     fromJSON(flatten=TRUE)
 
   url <- output[["next"]]
+  recordCount <- output[["count"]]
 
-  output$results
+  output <- output$results
 
   os <- object.size(output)
   cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
 
-  while (length(url) > 0 & !is.null(url) & grepl("api", url)) {
+  while (length(url) > 0 & !is.null(url) & grepl("api", url) & pageNo < 6) {
     pageNo <- pageNo + 1
     query <- list()
     cat("\n", "Getting ", object, " page ", pageNo,"...")
@@ -83,19 +84,22 @@ api_call <- function(fields, object) {
     }
 
     partialOutput <- partialOutput %>% 
-    content(as="text", encoding="UTF-8") %>%
-    fromJSON(flatten=TRUE)
+      content(as="text", encoding="UTF-8") %>%
+      fromJSON(flatten=TRUE)
 
     url <- partialOutput[["next"]]
-
-    partialOutput$results
+    
+    partialOutput <- partialOutput$results
 
     output <- rbind(output, partialOutput)
-
-      os <- object.size(output)
-      cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
+    
+    os <- object.size(output)
+    cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
   }
-  message("\n", "Status: Finished getting ", object, ". Processing...")
+  
+  message("\n", " Finished getting ", object, "! Processing ", recordCount, " records...")
+
+  output
 }
 
 # ---- Formatting ----
