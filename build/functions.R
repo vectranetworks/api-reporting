@@ -59,7 +59,7 @@ api_call <- function(fields, object) {
   os <- object.size(output)
   cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
 
-  while (!is.null(url) & grepl("api", url)) {
+  while (length(url) > 0 & !is.null(url) & grepl("api", url)) {
     pageNo <- pageNo + 1
     query <- list()
     cat("\n", "Getting ", object, " page ", pageNo,"...")
