@@ -21,10 +21,41 @@ api_call <- function(fields, object) {
   pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
 
+  countQuery <- list("page_size"=1)
   query <- list("page_size"=2500)
   if (fields!="everything") query[["fields"]] <- fields
 
-  cat("\n\n", "Getting ", object, " page ", pageNo,"...")
+#Get the object size first
+# Try api call 5 times if it fails
+  # GET is an overlay to curl
+  for(i in 1:5) {
+    output <- GET(
+      url = url,
+      config = self_signed,
+      add_headers(Authorization = auth),
+      query = countQuery
+    )
+    if (output$status_code == 200) break
+  }
+
+  # Handle invalid api call: error message and quit
+  if (output$status_code != 200) {
+    cat(paste(
+      "\n\nAPI Fail: Status Code", output$status_code, 
+      "\nCredentials might have changed",
+      "\nCheck token & dns values for typos or spaces\n\n"
+    ))
+    quit(save="yes")
+  }
+
+  output <- output %>% 
+    content(as="text", encoding="UTF-8") %>%
+    fromJSON(flatten=TRUE)
+
+  recordCount <- output[["count"]]
+  cat("\n\n", "Found", format(recordCount, big.mark = ",", scientific = FALSE), object, "| Pages expected:", ceiling(recordCount/2500),"| Collecting data...")
+
+  cat("\n", "Getting ", object, " page ", pageNo,"...")
   # Try api call 5 times if it fails
   # GET is an overlay to curl
   for(i in 1:5) {
@@ -53,14 +84,17 @@ api_call <- function(fields, object) {
     fromJSON(flatten=TRUE)
 
   url <- output[["next"]]
-  recordCount <- output[["count"]]
+
+  if (is.null(url)) {
+    url <- "nullURL"
+  } 
 
   output <- output$results
 
   os <- object.size(output)
   cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
 
-  while (length(url) > 0 & !is.null(url) & grepl("api", url)) {
+  while (!grepl("nullURL", url)) {
     pageNo <- pageNo + 1
     query <- list()
     cat("\n", "Getting ", object, " page ", pageNo,"...")
@@ -89,6 +123,9 @@ api_call <- function(fields, object) {
 
     url <- partialOutput[["next"]]
     
+    if (is.null(url)) {
+      url <- "nullURL"
+    } 
     partialOutput <- partialOutput$results
 
     output <- rbind(output, partialOutput)
@@ -97,7 +134,7 @@ api_call <- function(fields, object) {
     cat("\r", "Status: Got ", object, " page ", pageNo, "(temp object size: ", format(os, units = "auto", standard = "SI", digits = 1L), ")")
   }
 
-  message("\n", " Finished getting ", object, "! Processing ", recordCount, " records...")
+  message("\n", " Finished getting ", object, "!")
 
   output
 }
