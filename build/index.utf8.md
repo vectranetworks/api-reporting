@@ -9,55 +9,23 @@ knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding, output_dir = "..") })
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-options(warn=-1)
-```
 
-```{r libs, include=FALSE}
-source("functions.R")
-source("libraries.R")
-theme_set(theme_minimal())
-```
 
-```{r}
-h <- read_log("../logs/hosts.csv")
-hm <- read_log("../logs/host_metrics.csv")
-a <- read_log("../logs/assigned.csv")
-n <- read_log("../logs/notes.csv")
-  #%>% filter(custom_grep("btp|mtp|fp", note))
-s <- hm %>% select(date, low, medium, high, critical)
-hod <- hm %>% select(date, hosts_observed, hosts_w_detections)
-```
+
+
+
 
 ## Host Metrics {.tabset}
 
 ### Host Severity
 
-```{r, out.width='100%'}
-color_scheme <- c("low" = "#3E6876", "medium" = "#FFB131", "high" = "#FF591E", "critical" = "#DE1829")
-
-ggplotly(
-  tooltip = c("x", "y", "group"),
-  melt(s, id.vars="date", value.name="Count", variable.name = "Host Severity") %>%
-  ggplot(aes(x=date, y=Count, group=`Host Severity`, color=`Host Severity`)) +
-  geom_line() +
-  geom_point() +
-  scale_color_manual(values = color_scheme)
-)
-```
+preserve7ab42aef02f6c3ce
 
 ## Workload Reduction {.tabset}
 
 Here you can see the overall workload reduction Cognito has produced for you. Metrics are filterable for different time periods.
 
-```{r}
-c_m <- vis_this_time(h,a,hm,n,"month")
-c_q <- vis_this_time(h,a,hm,n,"quarter")
 
-l_m <- vis_last_time(h,a,hm,n,"month")
-l_q <- vis_last_time(h,a,hm,n,"quarter")
-```
 
 
 ### This Month
@@ -76,15 +44,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_m$hwd2` </a> </div>
+  <div id="w-label"> <a id="stat"> 107 </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_m$low`, </a> </div>
+  <div id="w-label"> <a id="stat"> (103, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> 4, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$high`, </a> </div>
+  <div id="w-label"> <a id="stat"> 0, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_m$crit`) </a> </div>
+  <div id="w-label"> <a id="stat"> 0) </a> </div>
 </div>
 
 </div>
@@ -107,15 +75,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_m$hwd2` </a> </div>
+  <div id="w-label"> <a id="stat"> 154 </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_m$low`, </a> </div>
+  <div id="w-label"> <a id="stat"> (66, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> 84, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$high`, </a> </div>
+  <div id="w-label"> <a id="stat"> 4, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_m$crit`) </a> </div>
+  <div id="w-label"> <a id="stat"> 0) </a> </div>
 </div>
 
 </div>
@@ -138,15 +106,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r c_q$hwd2` </a> </div>
+  <div id="w-label"> <a id="stat"> 138.3 </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r c_q$low`, </a> </div>
+  <div id="w-label"> <a id="stat"> (78.3, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> 57.3, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$high`, </a> </div>
+  <div id="w-label"> <a id="stat"> 2.7, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r c_q$crit`) </a> </div>
+  <div id="w-label"> <a id="stat"> 0) </a> </div>
 </div>
 
 </div>
@@ -169,15 +137,15 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
   <div id="w-label">Avg. Critical Hosts</div>
 </div>
 <div>
-  <div id="w-label"> <a id="stat"> `r l_q$hwd2` </a> </div>
+  <div id="w-label"> <a id="stat"> NaN </a> </div>
   <div id="w-arrow"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> (`r l_q$low`, </a> </div>
+  <div id="w-label"> <a id="stat"> (NaN, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$medium`, </a> </div>
+  <div id="w-label"> <a id="stat"> NaN, </a> </div>
   <div id="w-arrow" style="color:white;"> ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$high`, </a> </div>
+  <div id="w-label"> <a id="stat"> NaN, </a> </div>
   <div id="w-arrow" style="color:white;" > ⟶ </div>
-  <div id="w-label"> <a id="stat"> `r l_q$crit`) </a> </div>
+  <div id="w-label"> <a id="stat"> NaN) </a> </div>
 </div>
 
 </div>
@@ -188,15 +156,7 @@ l_q <- vis_last_time(h,a,hm,n,"quarter")
 
 Here you can see current metrics for hosts. If you'd like to look at how these values have changed historically, see the download section below.
 
-```{r, out.width='100%', eval=FALSE}
-current_h <- h %>% 
-  group_by(ip) %>%
-  slice(which.max(last_detection_timestamp))
 
-reactable(current_h, filterable=TRUE, highlight=TRUE)
-
-write_csv(current_h, "../data/current_hosts.csv")
-```
 
 ## Download
 

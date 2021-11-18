@@ -151,8 +151,6 @@ api_format <- function(df, object) {
     df %>%
       rename(
         fired = first_timestamp,
-        note_date = note_modified_timestamp,
-        note_user = note_modified_by,
         assigned_user = assigned_to,
         triaged = triage_rule_id,
         type = detection_category
@@ -160,10 +158,8 @@ api_format <- function(df, object) {
       mutate(
         fired = api_date(fired),
         assigned_date = api_date(assigned_date),
-        note_date = api_date(note_date),
         assigned_user = as.character(assigned_user),
-        note_user = as.character(note_user),
-        note = as.character(note),
+        note = as.character(notes),
         triaged = ifelse(!is.na(triaged), TRUE, FALSE)
       ) %>%
       arrange(fired)
