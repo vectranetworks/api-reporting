@@ -15,29 +15,14 @@ get_creds <- function(){
 
 api_call <- function(fields, object) {
 
-# Setting arguments for get() below
-if (object == "detections") {
-  countUrl <- paste0(Sys.getenv("url"), "search/")
-  url <- paste0(Sys.getenv("url"), "search/")
-
-  countUrl <- paste0(countUrl, object)
-  countUrl <- paste0(countUrl, "/?page_size=1")
-  url <- paste0(url, object)
-  url <- paste0(url, "/?page_size=2500")
-  url <- paste0(url, "&query_string=detection.notes.note:*btp* OR detection.notes.note:*mtp* OR detection.notes.note:*fp*")
-  countUrl <- paste0(countUrl, "&query_string=detection.notes.note:*btp* OR detection.notes.note:*mtp* OR detection.notes.note:*fp*")
-} else {
-  countUrl <- paste0(Sys.getenv("url"), object)
-  countUrl <- paste0(countUrl, "/?page_size=1")
-  url <- paste0(Sys.getenv("url"), object)
-  url <- paste0(url, "/?page_size=2500")
-}
+  # Setting arguments for get() below
   auth <- paste("Token ", Sys.getenv("token"))
-
+  url <- paste0(Sys.getenv("url"), object)
   pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
-  query <- list()
 
+  countQuery <- list("page_size"=1)
+  query <- list("page_size"=2500)
   if (fields!="everything") query[["fields"]] <- fields
 
 #Get the object size first
@@ -45,10 +30,10 @@ if (object == "detections") {
   # GET is an overlay to curl
   for(i in 1:5) {
     output <- GET(
-      url = countUrl,
+      url = url,
       config = self_signed,
       add_headers(Authorization = auth),
-      query = query
+      query = countQuery
     )
     if (output$status_code == 200) break
   }
@@ -77,7 +62,7 @@ if (object == "detections") {
     output <- GET(
       url = url,
       config = self_signed,
-      add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache", "Accept" = "application/json"),
+      add_headers(Authorization = auth),
       query = query
     )
     if (output$status_code == 200) break
@@ -111,6 +96,7 @@ if (object == "detections") {
 
   while (!grepl("nullURL", url)) {
     pageNo <- pageNo + 1
+    query <- list()
     cat("\n", "Getting ", object, " page ", pageNo,"...")
 
     # Try api call 5 times if it fails
@@ -119,7 +105,7 @@ if (object == "detections") {
       partialOutput <- GET(
         url = url,
         config = self_signed,
-        add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache", "Accept" = "application/json"),
+        add_headers(Authorization = auth, "Content-Type" = "application/json", "Cache-Control" = "no-cache"),
         query = query
       )
       if (partialOutput$status_code == 200) break

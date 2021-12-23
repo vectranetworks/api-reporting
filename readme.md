@@ -25,13 +25,7 @@ docker build -t app .
 
 #### Run app
 ```
-#### Linux
 docker run -it -p 4321:4321 -v $(pwd):/home/app app
-
-#### Mac
-#### edit /etc/auto_master # comment out the line with /home in it.
-#### sudo automount -vc
-docker run -it -p 4321:4321 -v "$(pwd):/home/app" app
 ```
 
 You will be prompted to enter your DNS name (found in Cognito Settings) and API token (found in My Profile).
