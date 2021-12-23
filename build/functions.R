@@ -17,8 +17,6 @@ api_call <- function(fields, object) {
 
 # Setting arguments for get() below
 if (object == "detections") {
-  countQuery <- list()
-  query <- list()
   countUrl <- paste0(Sys.getenv("url"), "search/")
   url <- paste0(Sys.getenv("url"), "search/")
 
@@ -29,15 +27,16 @@ if (object == "detections") {
   url <- paste0(url, "&query_string=detection.notes.note:*btp* OR detection.notes.note:*mtp* OR detection.notes.note:*fp*")
   countUrl <- paste0(countUrl, "&query_string=detection.notes.note:*btp* OR detection.notes.note:*mtp* OR detection.notes.note:*fp*")
 } else {
-  countQuery <- list("page_size" = 1)
-  query <- list("page_size" = 2500)
   countUrl <- paste0(Sys.getenv("url"), object)
+  countUrl <- paste0(countUrl, "/?page_size=1")
   url <- paste0(Sys.getenv("url"), object)
+  url <- paste0(url, "/?page_size=2500")
 }
   auth <- paste("Token ", Sys.getenv("token"))
 
   pageNo <- 1
   self_signed <- httr::config(ssl_verifypeer=FALSE, ssl_verifyhost=FALSE)
+  query <- list()
 
   if (fields!="everything") query[["fields"]] <- fields
 
@@ -49,7 +48,7 @@ if (object == "detections") {
       url = countUrl,
       config = self_signed,
       add_headers(Authorization = auth),
-      query = countQuery
+      query = query
     )
     if (output$status_code == 200) break
   }

@@ -3,9 +3,9 @@
 cat("Calling API (2.5k results per page)...")
 
 #d_fields <- "id,src_ip,first_timestamp,assigned_date,assigned_to,notes,triage_rule_id,detection_category"
+#h_fields <- "id,name,ip,threat,certainty,severity,last_detection_timestamp"
 d_fields <- "everything"
-h_fields <- "id,name,ip,threat,certainty,severity,last_detection_timestamp"
-#h_fields <- "everything"
+h_fields <- "everything"
 
 d <- api_call(d_fields, "detections") %>% api_format("d")
 h <- api_call(h_fields, "hosts") %>% api_format("h")
