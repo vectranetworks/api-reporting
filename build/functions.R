@@ -162,7 +162,7 @@ api_format <- function(df, object) {
         fired = api_date(fired),
         assigned_date = api_date(assigned_date),
         assigned_user = as.character(assigned_user),
-        note = tolower(as.character(notes)),
+        note = as.character(notes),
         triaged = ifelse(!is.na(triaged), TRUE, FALSE)
       ) %>%
       arrange(fired)
